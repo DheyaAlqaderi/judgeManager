@@ -1,0 +1,1 @@
+{"flutter":{"platforms":{"android":{"default":{"projectId":"digitstitch-app","appId":"1:905233487637:android:5d9356ccaee1809fbebb1c","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"digitstitch-app","configurations":{"android":"1:905233487637:android:5d9356ccaee1809fbebb1c","ios":"1:905233487637:ios:ebf4153fe5b34bf1bebb1c"}}}}}}

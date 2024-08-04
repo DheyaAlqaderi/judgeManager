@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "905233487637",
+    "project_id": "digitstitch-app",
+    "storage_bucket": "digitstitch-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:905233487637:android:41f32a2ad34aae05bebb1c",
+        "android_client_info": {
+          "package_name": "com.example.ds_applcation"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDJ7tVIMqf_J19tmLq0MFvbOi9JvNC79A4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:905233487637:android:5d9356ccaee1809fbebb1c",
+        "android_client_info": {
+          "package_name": "com.judgemanager.judgemanager"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDJ7tVIMqf_J19tmLq0MFvbOi9JvNC79A4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
