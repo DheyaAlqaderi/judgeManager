@@ -17,16 +17,17 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _selectedIndex = -1;
+  int _selectedIndex = 3;
   String tomorrow='';
   String? phoneNumber;
 
-  Future<void> getPhoneNumber()async{
+  Future<void> getPhoneNumber() async {
     final phone = await SharedPrefManager.getData(AppConstant.userPhoneNumber);
-    if(phone != null && phone.isNotEmpty){
+    if (phone != null && phone.isNotEmpty) {
       setState(() {
         phoneNumber = phone;
       });
+      print(phoneNumber);
     }
   }
 
@@ -37,6 +38,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
   @override
   Widget build(BuildContext context) {
+    // Check if phoneNumber is null
+    if (phoneNumber == null) {
+      return const Center(child: CircularProgressIndicator()); // Or any other placeholder widget
+    }
     return Scaffold(
       body: SingleChildScrollView(
         scrollDirection: Axis.vertical,
@@ -74,7 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         const SizedBox(height: 40,),
                         StreamBuilder(
-                            stream:  FirebaseRepository.getJudgeDocument(phoneNumber??""),
+                            stream:  FirebaseRepository.getJudgeDocument(phoneNumber!),
                             builder:(context, snapshot){
                               if (snapshot.connectionState == ConnectionState.waiting) {
                                 return const Center(child: CircularProgressIndicator());
@@ -98,7 +103,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                   InkWell(
                                     onTap: (){
-                                      Navigator.of(context).pushReplacement(
+                                      Navigator.of(context).push(
                                         MaterialPageRoute(builder: (context) =>  EditorHomeScreen(name: docData['name'],phoneNumber: docData['phone_number'],)),
                                       );
                                     },

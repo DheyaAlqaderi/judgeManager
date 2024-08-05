@@ -23,6 +23,7 @@ class FirebaseRepository{
     return _firebaseFirestore
         .collection('cases')
         .where('procedure', isEqualTo: procedure)
+        .where('judge_number', isEqualTo: phoneNumber)
         .snapshots();
   }
 

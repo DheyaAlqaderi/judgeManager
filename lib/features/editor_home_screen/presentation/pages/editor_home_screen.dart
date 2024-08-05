@@ -17,8 +17,16 @@ class EditorHomeScreen extends StatefulWidget {
 }
 
 class _EditorHomeScreenState extends State<EditorHomeScreen> {
+
+  String? procedureValue;
+  String? selectedProcedure;
+
   @override
   Widget build(BuildContext context) {
+    // Check if phoneNumber is null
+    if (procedureValue == null) {
+      return const Center(child: CircularProgressIndicator()); // Or any other placeholder widget
+    }
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -93,7 +101,15 @@ class _EditorHomeScreenState extends State<EditorHomeScreen> {
                         }
 
                         if (!casesSnapshot.hasData || casesSnapshot.data!.docs.isEmpty) {
-                          return const Center(child: Text('No cases available'));
+                          return GestureDetector(
+                            onTap: () {
+                              print('Procedure clicked: $procedure');
+                              setState(() {
+                                selectedProcedure = procedure;
+                              });
+                            },
+                            child: buildCounter("0", 'للأطلاع'),
+                          );
                         }
 
                         final cases = casesSnapshot.data!.docs;
@@ -102,7 +118,15 @@ class _EditorHomeScreenState extends State<EditorHomeScreen> {
                           return data['procedure'] == procedure;
                         }).length;
 
-                        return buildCounter(procedureCount.toString(), procedure);
+                        return GestureDetector(
+                          onTap: () {
+                            print('Procedure clicked: $procedure');
+                            setState(() {
+                              selectedProcedure = procedure;
+                            });
+                          },
+                          child: buildCounter(procedureCount.toString(), procedure),
+                        );
                       },
                     );
                   }).toList(),
@@ -148,28 +172,213 @@ class _EditorHomeScreenState extends State<EditorHomeScreen> {
                       ),
                     ),
                   ),
-                  // InkWell(
-                  //   onTap: (){},
-                  //   child: Container(
-                  //     width: 52,
-                  //     height: 40,
-                  //     decoration: BoxDecoration(
-                  //       borderRadius: BorderRadius.circular(100),
-                  //       color: Theme.of(context).cardColor,
-                  //     ),
-                  //     child: Padding(
-                  //       padding: const EdgeInsets.all(8.0),
-                  //       child: SvgPicture.asset(
-                  //
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
                 ],
               ),
             ),
             const SizedBox(height: 20),
+            if (selectedProcedure != null)
+            StreamBuilder(
+                stream: FirebaseRepository.getAllCasesByProcedure(phoneNumber: widget.phoneNumber,procedure: selectedProcedure!),
+                builder: (context, snapshot){
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
 
+                  if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  }
+
+                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    return const Center(child: Text('No cases available'));
+                  }
+                  final List<Widget> caseWidgets = snapshot.data!.docs.map((doc) {
+                    final caseData = doc.data() as Map<String, dynamic>;
+
+                    return Stack(
+                      children: [
+                        Container(
+                          width: double.infinity, // Adjust width for better readability
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(18),
+                            color: Colors.grey, // Background color
+                          ),
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                caseData['case_title'] ?? 'No Title',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  fontSize: 16.0,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 8.0),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      caseData['appellant'] ?? 'Unknown',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16.0,
+                                        color: Colors.brown,
+                                      ),
+                                      textAlign: TextAlign.right,
+                                    ),
+                                  ),
+                                  const Text(
+                                    ' :المدعي ',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 4.0),
+                              Row(
+                                children: [
+
+                                  Expanded(
+                                    child: Text(
+                                      caseData['respondent'] ?? 'Unknown',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16.0,
+                                        color: Colors.brown,
+                                      ),
+                                      textAlign: TextAlign.right,
+                                    ),
+                                  ),
+
+                                  const Text(
+                                    ' :المدعى عليه ',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 4.0),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      caseData['case_number'] ?? 'Unknown',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16.0,
+                                        color: Colors.brown,
+                                      ),
+                                      textAlign: TextAlign.right,
+                                    ),
+                                  ),
+                                  const Text(
+                                    ' :رقم القضية ',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 4.0),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      caseData['procedure'] ?? 'Unknown',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16.0,
+                                        color: Colors.brown,
+                                      ),
+                                      textAlign: TextAlign.right,
+                                    ),
+                                  ),
+                                  const Text(
+                                    ' :نوع القضية ',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+                            ],
+                          ),
+                        ),
+
+                        Positioned(
+                          top: 0,
+                          left: 0,
+                          child: InkWell(
+                            onTap: (){
+                              // Show the alert dialog
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: const Text('تأكيد الحذف'),
+                                    content: const Text('هل أنت متأكد من حذف هذه القضية'),
+                                    actions: <Widget>[
+                                      TextButton(
+                                        onPressed: () {
+                                          // Cancel the deletion
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: const Text('رجوع',style: TextStyle(color: Colors.brown)),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          // Confirm the deletion
+                                          Navigator.of(context).pop();
+                                          // Perform the delete operation here
+                                          deleteItem();
+                                        },
+                                        child: const Text('حذف', style: TextStyle(color: Colors.brown),),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Container(
+                                height: 30,
+                                width: 30,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20),
+                                  color: Colors.grey
+                                ),
+                                child: const Center(
+                                  child: Icon(Icons.highlight_remove, color: Colors.brown,),
+                                ),
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
+                    );
+                  }).toList();
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Wrap(
+                      spacing: 15.0, // Horizontal space between containers
+                      runSpacing: 15.0, // Vertical space between containers
+                      children: caseWidgets,
+                    ),
+                  );
+                }
+            )
 
         ],
         ),
@@ -213,5 +422,15 @@ class _EditorHomeScreenState extends State<EditorHomeScreen> {
         ),
       ],
     );
+  }
+  Future<void> deleteItem(item) async {
+    // Implement your delete logic here
+    try {
+      // Get a reference to the Firestore collection and document
+      await FirebaseFirestore.instance.collection('cases').doc(item).delete();
+      print('Item deleted successfully');
+    } catch (e) {
+      print('Failed to delete item: $e');
+    }
   }
 }

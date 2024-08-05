@@ -86,7 +86,6 @@ class LoginRepository{
         if (userDoc.exists && userDoc.data() != null) {
           final bool isActive = userDoc.get(AppConstant.isActive);
           if (isActive) {
-            SnackbarHelper.showSuccess("القاضي مفعل");
             return true; // User is active
           } else {
             SnackbarHelper.showWarning("القاضي غير مفعل, الرجاء متابعة المسؤول لتفعيل حسابك");
