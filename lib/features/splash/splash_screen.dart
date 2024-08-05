@@ -1,10 +1,11 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:judgemanager/core/constant/app_constant.dart';
-import 'package:judgemanager/core/utills/helpers/local_database/shared_pref.dart';
 import 'package:judgemanager/core/utills/images/images_path.dart';
-import 'package:judgemanager/features/login/domain/repository/login_repository.dart';
 import 'package:judgemanager/features/login/presentation/pages/login_screen.dart';
+import 'package:judgemanager/features/login/presentation/provider/login_provider.dart';
+import 'package:provider/provider.dart';
 
 import '../home/presentation/pages/home_screen.dart';
 
@@ -24,38 +25,21 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> getUserPhone() async {
-    // Retrieve the user phone number from shared preferences
-    final userPhone = await SharedPrefManager.getData(AppConstant.userPhoneNumber);
-    Future.delayed(const Duration(seconds: 1), () async {
-      if (userPhone
-          .toString()
-          .isNotEmpty && userPhone != null) {
-        bool checkIsActive = await LoginRepository.isUserActive(
-            phoneNumber: userPhone.toString());
-        if (checkIsActive) {
-          // Navigate to HomeScreen if userPhone has a value
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const HomeScreen()),
-          );
-        } else {
-          // Navigate to LoginScreen if userPhone is null or empty
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => LoginScreen()),
-          );
-        }
-      } else {
-        // Navigate to LoginScreen if userPhone is null or empty
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => LoginScreen()),
-        );
-      }
-    });
+    bool check =  await context.read<LoginProvider>().hadAUserPhone();
+    navigate(check);
   }
 
-
+  navigate(check){
+    if(check){
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
+      );
+    } else {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => LoginScreen()),
+      );
+    }
+  }
 
 
   @override
@@ -63,7 +47,6 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       body: Stack(
         children: [
-
           Positioned(
             top: 0,
             right: 0,

@@ -1,13 +1,13 @@
 
-import 'dart:ffi';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
-import 'package:hijri/hijri_calendar.dart';
-import 'package:intl/intl.dart';
+import 'package:judgemanager/core/constant/app_constant.dart';
+import 'package:judgemanager/core/firebase/firebase_repository.dart';
+import 'package:judgemanager/core/utills/helpers/functions_date/get_date.dart';
+import 'package:judgemanager/core/utills/helpers/local_database/shared_pref.dart';
+
+import '../../../editor_home_screen/presentation/pages/editor_home_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -19,24 +19,22 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = -1;
   String tomorrow='';
+  String? phoneNumber;
+
+  Future<void> getPhoneNumber()async{
+    final phone = await SharedPrefManager.getData(AppConstant.userPhoneNumber);
+    if(phone != null && phone.isNotEmpty){
+      setState(() {
+        phoneNumber = phone;
+      });
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    // tomorrow = getTomorrowDate(); // Initialize the value
+    getPhoneNumber();
   }
-  final List<String> stringList = [
-    'Container 1',
-    'Container 2',
-    'Container 3',
-    'Container 4',
-    'Container 5',
-    'Container 6',
-    'Container 7',
-    'Container 8',
-    'Container 9',
-    'Container 10'
-  ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,7 +43,6 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           children: [
 
-            /// appbar section
             Stack(
               children: [
 
@@ -76,31 +73,57 @@ class _HomeScreenState extends State<HomeScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 40,),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Padding(
-                              padding: EdgeInsets.only(left: 12.0),
-                              child: Text('أحمد محب حمزة' ,style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),),
-                            ),
-                            Container(
-                              height: 40,
-                              width: 40,
-                              decoration: BoxDecoration(
-                                gradient: const LinearGradient(
-                                  colors: [Colors.grey, Color(0xFFC67C4E)], // ألوان التدرج
-                                  begin: Alignment.bottomRight, // بداية التدرج
-                                  end: Alignment.topLeft, // نهاية التدرج
-                                ),
-                                borderRadius: BorderRadius.circular(25),
-                                color: const Color(0xFFC67C4E),
-                              ),
-                              child: const Center(
-                                child: Icon(Icons.settings, color: Colors.white,),
-                              ),
-                            )
-                          ],
+                        StreamBuilder(
+                            stream:  FirebaseRepository.getJudgeDocument(phoneNumber??""),
+                            builder:(context, snapshot){
+                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                return const Center(child: CircularProgressIndicator());
+                              }
+
+                              if (snapshot.hasError) {
+                                return Center(child: Text('Error: ${snapshot.error}'));
+                              }
+
+                              if (!snapshot.hasData || !snapshot.data!.exists) {
+                                return const Center(child: Text('No data available'));
+                              }
+                              final docData = snapshot.data!.data() as Map<String, dynamic>;
+                              return Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 12.0),
+                                    child: Text( "القاضي/ ${docData['name']}",style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),),
+                                  ),
+                                  InkWell(
+                                    onTap: (){
+                                      Navigator.of(context).pushReplacement(
+                                        MaterialPageRoute(builder: (context) =>  EditorHomeScreen(name: docData['name'],phoneNumber: docData['phone_number'],)),
+                                      );
+                                    },
+                                    child: Container(
+                                      height: 40,
+                                      width: 40,
+                                      decoration: BoxDecoration(
+                                        gradient: const LinearGradient(
+                                          colors: [Color(0xFFC67C4E), Colors.grey], // ألوان التدرج
+                                          begin: Alignment.bottomRight, // بداية التدرج
+                                          end: Alignment.topLeft, // نهاية التدرج
+                                        ),
+                                        borderRadius: BorderRadius.circular(25),
+                                        color: const Color(0xFFC67C4E),
+                                      ),
+                                      child: const Center(
+                                        child: Icon(Icons.edit, color: Colors.white,),
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              );
+                            }
                         ),
+
                         const SizedBox(height: 65,),
                         Row(
                           children: [
@@ -113,7 +136,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   width: double.infinity,
                                   decoration: BoxDecoration(
                                     gradient: const LinearGradient(
-                                      colors: [Colors.grey, Color(0xFFC67C4E)], // ألوان التدرج
+                                      colors: [Color(0xFFC67C4E), Colors.grey], // ألوان التدرج
                                       begin: Alignment.bottomRight, // بداية التدرج
                                       end: Alignment.topLeft, // نهاية التدرج
                                     ),
@@ -139,7 +162,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               width: 60,
                               decoration: BoxDecoration(
                                 gradient: const LinearGradient(
-                                  colors: [Colors.grey, Color(0xFFC67C4E)], // ألوان التدرج
+                                  colors: [Color(0xFFC67C4E), Colors.grey], // ألوان التدرج
                                   begin: Alignment.bottomRight, // بداية التدرج
                                   end: Alignment.topLeft, // نهاية التدرج
                                 ),
@@ -159,20 +182,25 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ],
             ),
+            /// appbar section
+
             Column(
               children: [
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
-                    children: List.generate(3, (index) {
+                    children: List.generate(4, (index) {
                       return Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: GestureDetector(
                           onTap: () {
                             setState(() {
-                              _selectedIndex = index; // تحديث العنصر المحدد
+                              if(_selectedIndex == index){
 
+                              }else {
+                                _selectedIndex = index; // تحديث العنصر المحدد
+                              }
                             });
 
                           },
@@ -185,7 +213,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             child:  Center(
                                 child: Text(
-                                  2 == index?"اليوم":(1 == index)?"غدًا":"باقي الأيام",
+                                  3 == index?"اليوم":(2 == index)?"غدًا":(1 == index)?"بعد غدًا":"باقي الأيام",
                                   style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
@@ -204,22 +232,49 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
 
             const SizedBox(height: 5,),
-             Column(
+             const SizedBox(height: 5,),
+             (0 == _selectedIndex)
+                 ?Column(
                children: [
-                 Align(
-                    alignment: Alignment.centerRight,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text("${(1 == _selectedIndex) ? getNextDay(_getDay1())  : _getDay1()} - ${_getMonth()} - ${_getYear()}هـ", style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),),
-                    )
-                           ),
+                 _buildStream(stream: FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getTodayDate()), dayH: GetDate.getDayH(),date: GetDate.getTodayDate()),
+                 _buildStream(stream: FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getNextDay()), dayH: GetDate.getNextDayH(),date: GetDate.getNextDay()),
+                 _buildStream(stream: FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getNextNextDay()), dayH: GetDate.getNextNextDayH(), date: GetDate.getNextNextDay()),
 
-                 const SizedBox(height: 5,),
-                 (02 == _selectedIndex)?StreamBuilder<QuerySnapshot>(
-                   stream: FirebaseFirestore.instance
-                       .collection('cases')
-                       .where('session_date', isEqualTo: getTodayDate())
-                       .snapshots(),
+                 _buildStream(stream: FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getNextNext1Day()), dayH: GetDate.getNextNext1DayH(),date: GetDate.getNextNext1Day()),
+                 _buildStream(stream: FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getNextNext2Day()), dayH: GetDate.getNextNext2DayH(),date: GetDate.getNextNext2Day()),
+                 _buildStream(stream: FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getNextNext3Day()), dayH: GetDate.getNextNext3DayH(), date: GetDate.getNextNext3Day()),
+                 _buildStream(stream: FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getNextNext4Day()), dayH: GetDate.getNextNext4DayH(), date: GetDate.getNextNext4Day()),
+
+               ],
+             ):Column(
+               children: [
+                 Row(
+                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                   children: [
+                     Align(
+                         alignment: Alignment.centerRight,
+                         child: Padding(
+                           padding: const EdgeInsets.all(8.0),
+                           child: Text("${(1 == _selectedIndex) ?GetDate.getNextNextDayH():(2 == _selectedIndex) ?GetDate.getNextDayH()  : GetDate.getDayH()} - ${GetDate.getMonthH()} - ${GetDate.getYearH()}هـ", style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),),
+                         )
+                     ),
+                     Align(
+                         alignment: Alignment.centerLeft,
+                         child: Padding(
+                           padding: const EdgeInsets.all(8.0),
+                           child: Text((3 == _selectedIndex)?GetDate.getTodayDate():(2 == _selectedIndex)?GetDate.getNextDay():GetDate.getNextNextDay(), style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),),
+                         )
+                     ),
+                   ],
+                 ),
+                 StreamBuilder<QuerySnapshot>(
+                   stream: (03 == _selectedIndex)
+                       ?FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getTodayDate())
+                       : (02 == _selectedIndex)
+                       ?FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getNextDay())
+                       : (01 == _selectedIndex)
+                       ?FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getNextNextDay())
+                       :FirebaseRepository.getAllCases(phoneNumber:phoneNumber??'0'),
                    builder: (context, snapshot) {
                      if (snapshot.connectionState == ConnectionState.waiting) {
                        return const Center(child: CircularProgressIndicator());
@@ -242,7 +297,7 @@ class _HomeScreenState extends State<HomeScreen> {
                            borderRadius: BorderRadius.circular(18),
                            color: Colors.grey, // Background color
                          ),
-                         padding: EdgeInsets.all(8.0),
+                         padding: const EdgeInsets.all(8.0),
                          child: Column(
                            crossAxisAlignment: CrossAxisAlignment.end,
                            children: [
@@ -256,14 +311,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                maxLines: 2,
                                overflow: TextOverflow.ellipsis,
                              ),
-                             SizedBox(height: 8.0),
+                             const SizedBox(height: 8.0),
                              Row(
                                crossAxisAlignment: CrossAxisAlignment.end,
                                children: [
                                  Expanded(
                                    child: Text(
                                      caseData['appellant'] ?? 'Unknown',
-                                     style: TextStyle(
+                                     style: const TextStyle(
                                        fontWeight: FontWeight.bold,
                                        fontSize: 16.0,
                                        color: Colors.brown,
@@ -271,7 +326,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                      textAlign: TextAlign.right,
                                    ),
                                  ),
-                                 Text(
+                                 const Text(
                                    ' :المدعي ',
                                    style: TextStyle(
                                      fontWeight: FontWeight.bold,
@@ -280,14 +335,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                  ),
                                ],
                              ),
-                             SizedBox(height: 4.0),
+                             const SizedBox(height: 4.0),
                              Row(
                                children: [
 
                                  Expanded(
                                    child: Text(
                                      caseData['respondent'] ?? 'Unknown',
-                                     style: TextStyle(
+                                     style: const TextStyle(
                                        fontWeight: FontWeight.bold,
                                        fontSize: 16.0,
                                        color: Colors.brown,
@@ -296,7 +351,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                    ),
                                  ),
 
-                                 Text(
+                                 const Text(
                                    ' :المدعى عليه ',
                                    style: TextStyle(
                                      fontWeight: FontWeight.bold,
@@ -305,13 +360,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                  ),
                                ],
                              ),
-                             SizedBox(height: 4.0),
+                             const SizedBox(height: 4.0),
                              Row(
                                children: [
                                  Expanded(
                                    child: Text(
                                      caseData['case_number'] ?? 'Unknown',
-                                     style: TextStyle(
+                                     style: const TextStyle(
                                        fontWeight: FontWeight.bold,
                                        fontSize: 16.0,
                                        color: Colors.brown,
@@ -319,7 +374,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                      textAlign: TextAlign.right,
                                    ),
                                  ),
-                                 Text(
+                                 const Text(
                                    ' :رقم القضية ',
                                    style: TextStyle(
                                      fontWeight: FontWeight.bold,
@@ -328,71 +383,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                  ),
                                ],
                              ),
-
-                           ],
-                         ),
-                       );
-                     }).toList();
-
-                     return Padding(
-                       padding: const EdgeInsets.all(8.0),
-                       child: Wrap(
-                         spacing: 15.0, // Horizontal space between containers
-                         runSpacing: 15.0, // Vertical space between containers
-                         children: caseWidgets,
-                       ),
-                     );
-                   },
-                 )
-                     :StreamBuilder<QuerySnapshot>(
-                   stream: FirebaseFirestore.instance
-                       .collection('cases')
-                       .where('session_date', isEqualTo: getNextDayDate())
-                       .snapshots(),
-                   builder: (context, snapshot) {
-                     if (snapshot.connectionState == ConnectionState.waiting) {
-                       return const Center(child: CircularProgressIndicator());
-                     }
-
-                     if (snapshot.hasError) {
-                       return Center(child: Text('Error: ${snapshot.error}'));
-                     }
-
-                     if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                       return const Center(child: Text('لا يوجد قضايا'));
-                     }
-
-                     final List<Widget> caseWidgets = snapshot.data!.docs.map((doc) {
-                       final caseData = doc.data() as Map<String, dynamic>;
-
-                       return Container(
-                         width: double.infinity, // Adjust width for better readability
-                         decoration: BoxDecoration(
-                           borderRadius: BorderRadius.circular(18),
-                           color: Colors.grey, // Background color
-                         ),
-                         padding: EdgeInsets.all(8.0),
-                         child: Column(
-                           crossAxisAlignment: CrossAxisAlignment.end,
-                           children: [
-                             Text(
-                               caseData['case_title'] ?? 'No Title',
-                               style: const TextStyle(
-                                 fontWeight: FontWeight.bold,
-                                 color: Colors.white,
-                                 fontSize: 16.0,
-                               ),
-                               maxLines: 2,
-                               overflow: TextOverflow.ellipsis,
-                             ),
-                             SizedBox(height: 8.0),
+                             const SizedBox(height: 4.0),
                              Row(
-                               crossAxisAlignment: CrossAxisAlignment.end,
                                children: [
                                  Expanded(
                                    child: Text(
-                                     caseData['appellant'] ?? 'Unknown',
-                                     style: TextStyle(
+                                     caseData['procedure'] ?? 'Unknown',
+                                     style: const TextStyle(
                                        fontWeight: FontWeight.bold,
                                        fontSize: 16.0,
                                        color: Colors.brown,
@@ -400,56 +397,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                      textAlign: TextAlign.right,
                                    ),
                                  ),
-                                 Text(
-                                   ' :المدعي ',
-                                   style: TextStyle(
-                                     fontWeight: FontWeight.bold,
-                                     color: Colors.black,
-                                   ),
-                                 ),
-                               ],
-                             ),
-                             SizedBox(height: 4.0),
-                             Row(
-                               children: [
-
-                                 Expanded(
-                                   child: Text(
-                                     caseData['respondent'] ?? 'Unknown',
-                                     style: TextStyle(
-                                       fontWeight: FontWeight.bold,
-                                       fontSize: 16.0,
-                                       color: Colors.brown,
-                                     ),
-                                     textAlign: TextAlign.right,
-                                   ),
-                                 ),
-
-                                 Text(
-                                   ' :المدعى عليه ',
-                                   style: TextStyle(
-                                     fontWeight: FontWeight.bold,
-                                     color: Colors.black,
-                                   ),
-                                 ),
-                               ],
-                             ),
-                             SizedBox(height: 4.0),
-                             Row(
-                               children: [
-                                 Expanded(
-                                   child: Text(
-                                     caseData['case_number'] ?? 'Unknown',
-                                     style: TextStyle(
-                                       fontWeight: FontWeight.bold,
-                                       fontSize: 16.0,
-                                       color: Colors.brown,
-                                     ),
-                                     textAlign: TextAlign.right,
-                                   ),
-                                 ),
-                                 Text(
-                                   ' :رقم القضية ',
+                                 const Text(
+                                   ' :نوع القضية ',
                                    style: TextStyle(
                                      fontWeight: FontWeight.bold,
                                      color: Colors.black,
@@ -473,9 +422,6 @@ class _HomeScreenState extends State<HomeScreen> {
                      );
                    },
                  ),
-
-
-
                ],
              ),
 
@@ -484,189 +430,181 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-  String getNextDayDate() {
-    final now = DateTime.now();
-    final nextDay = now.add(const Duration(days: 1));
-    return '${nextDay.year}-${nextDay.month.toString().padLeft(2, '0')}-${nextDay.day.toString().padLeft(2, '0')}';
-  }
 
-  String getTodayDate() {
-    final now = DateTime.now();
-    return '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
-  }
+  _buildStream({required dynamic stream, required dynamic dayH,required dynamic date}){
+    return Column(
+      children: [
+        const SizedBox(height: 10,),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Align(
+                alignment: Alignment.centerRight,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text("$dayH - ${GetDate.getMonthH()} - ${GetDate.getYearH()}هـ", style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),),
+                )
+            ),
+            Align(
+                alignment: Alignment.centerLeft,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(date, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),),
+                )
+            ),
+          ],
+        ),
 
-  String _getDay1(){
-    // Get the current date and time
-    DateTime now = DateTime.now();
+        StreamBuilder<QuerySnapshot>(
+          stream: stream,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-    // Get the day of the week as an integer (0 = Monday, 1 = Tuesday, ..., 6 = Sunday)
-    int dayOfWeek = now.weekday;
+            if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            }
 
-    // Convert the day of the week integer to a readable string
-    String dayName;
-    switch (dayOfWeek) {
-      case DateTime.monday:
-        dayName = 'الأثنين';
-        break;
-      case DateTime.tuesday:
-        dayName = 'الثلاثاء';
-        break;
-      case DateTime.wednesday:
-        dayName = 'الأربعاء';
-        break;
-      case DateTime.thursday:
-        dayName = 'الخميس';
-        break;
-      case DateTime.friday:
-        dayName = 'الجمعة';
-        break;
-      case DateTime.saturday:
-        dayName = 'السبت';
-        break;
-      case DateTime.sunday:
-        dayName = 'الأحد';
-        break;
-      default:
-        dayName = 'Unknown';
-    }
+            if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+              return const Center(child: Text('No cases available'));
+            }
 
-    return dayName;
-  }
+            final List<Widget> caseWidgets = snapshot.data!.docs.map((doc) {
+              final caseData = doc.data() as Map<String, dynamic>;
 
-  String _getMonth(){
-    // Get the current Gregorian date
-    DateTime now = DateTime.now();
+              return Container(
+                width: double.infinity, // Adjust width for better readability
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(18),
+                  color: Colors.grey, // Background color
+                ),
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      caseData['case_title'] ?? 'No Title',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: 16.0,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 8.0),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            caseData['appellant'] ?? 'Unknown',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16.0,
+                              color: Colors.brown,
+                            ),
+                            textAlign: TextAlign.right,
+                          ),
+                        ),
+                        const Text(
+                          ' :المدعي ',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4.0),
+                    Row(
+                      children: [
 
-    // Convert the Gregorian date to Hijri date
-    HijriCalendar hijriDate = HijriCalendar.fromDate(now);
+                        Expanded(
+                          child: Text(
+                            caseData['respondent'] ?? 'Unknown',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16.0,
+                              color: Colors.brown,
+                            ),
+                            textAlign: TextAlign.right,
+                          ),
+                        ),
 
-    // Get the current month in Hijri
-    int hijriMonth = hijriDate.hMonth;
-    String hijriMonthName;
+                        const Text(
+                          ' :المدعى عليه ',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4.0),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            caseData['case_number'] ?? 'Unknown',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16.0,
+                              color: Colors.brown,
+                            ),
+                            textAlign: TextAlign.right,
+                          ),
+                        ),
+                        const Text(
+                          ' :رقم القضية ',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4.0),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            caseData['procedure'] ?? 'Unknown',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16.0,
+                              color: Colors.brown,
+                            ),
+                            textAlign: TextAlign.right,
+                          ),
+                        ),
+                        const Text(
+                          ' :نوع القضية ',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ],
+                    ),
 
-    // Map Hijri month number to month name
-    switch (hijriMonth) {
-      case 1:
-        hijriMonthName = 'مُحرَّم';
-        break;
-      case 2:
-        hijriMonthName = 'صفر';
-        break;
-      case 3:
-        hijriMonthName = 'ربيع الأول';
-        break;
-      case 4:
-        hijriMonthName = 'ربيع الآخر';
-        break;
-      case 5:
-        hijriMonthName = 'جمادى الأولى';
-        break;
-      case 6:
-        hijriMonthName = 'جمادى الآخرة';
-        break;
-      case 7:
-        hijriMonthName = 'رجب';
-        break;
-      case 8:
-        hijriMonthName = 'شعبان';
-        break;
-      case 9:
-        hijriMonthName = 'رمضان';
-        break;
-      case 10:
-        hijriMonthName = 'شوّال';
-        break;
-      case 11:
-        hijriMonthName = 'ذو القعدة';
-        break;
-      case 12:
-        hijriMonthName = 'ذو الحجة';
-        break;
-      default:
-        hijriMonthName = 'غير معروف';
-    }
+                  ],
+                ),
+              );
+            }).toList();
 
-    // Print the current Hijri month
-    return hijriMonthName;
-  }
-
-  String _getYear(){
-    // Get the current Gregorian date
-    DateTime now = DateTime.now();
-
-    // Convert the Gregorian date to Hijri date
-    HijriCalendar hijriDate = HijriCalendar.fromDate(now);
-
-    int hijriYear = hijriDate.hYear;
-    // Print the current Hijri month
-    return hijriYear.toString();
-  }
-  String _getDay(int dayOfWeek) {
-    // Convert the day of the week integer to a readable string
-    switch (dayOfWeek) {
-      case DateTime.monday:
-        return 'الأثنين';
-      case DateTime.tuesday:
-        return 'الثلاثاء';
-      case DateTime.wednesday:
-        return 'الأربعاء';
-      case DateTime.thursday:
-        return 'الخميس';
-      case DateTime.friday:
-        return 'الجمعة';
-      case DateTime.saturday:
-        return 'السبت';
-      case DateTime.sunday:
-        return 'الأحد';
-      default:
-        return 'غير معروف';
-    }
-  }
-
-  String getNextDay(String currentDay) {
-    // Mapping of Arabic days to their English equivalents
-    final Map<String, String> dayMapping = {
-      'الأحد': 'Sunday',
-      'الاثنين': 'Monday',
-      'الثلاثاء': 'Tuesday',
-      'الأربعاء': 'Wednesday',
-      'الخميس': 'Thursday',
-      'الجمعة': 'Friday',
-      'السبت': 'Saturday'
-    };
-
-    // Reverse mapping for output
-    final Map<String, String> reverseDayMapping = {
-      'Sunday': 'الأحد',
-      'Monday': 'الاثنين',
-      'Tuesday': 'الثلاثاء',
-      'Wednesday': 'الأربعاء',
-      'Thursday': 'الخميس',
-      'Friday': 'الجمعة',
-      'Saturday': 'السبت'
-    };
-
-    // Get the English name of the current day
-    final currentDayInEnglish = dayMapping[currentDay];
-    if (currentDayInEnglish == null) {
-      throw ArgumentError('Invalid day provided');
-    }
-
-    // List of days in English
-    final List<String> daysOfWeek = [
-      'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'
-    ];
-
-    // Find the index of the current day
-    final currentIndex = daysOfWeek.indexOf(currentDayInEnglish);
-
-    // Calculate the index of the next day
-    final nextIndex = (currentIndex + 1) % 7;
-
-    // Get the next day in English
-    final nextDayInEnglish = daysOfWeek[nextIndex];
-
-    // Return the next day in Arabic
-    return reverseDayMapping[nextDayInEnglish]!;
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Wrap(
+                spacing: 15.0, // Horizontal space between containers
+                runSpacing: 15.0, // Vertical space between containers
+                children: caseWidgets,
+              ),
+            );
+          },
+        ),
+      ],
+    );
   }
 }

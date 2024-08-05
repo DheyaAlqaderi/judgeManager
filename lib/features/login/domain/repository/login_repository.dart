@@ -6,6 +6,7 @@ import 'package:judgemanager/core/utills/helpers/local_database/shared_pref.dart
 import 'package:judgemanager/core/utills/helpers/snackbar_helper.dart';
 
 class LoginRepository{
+
   static Future<bool> login({required String phoneNumber, required password})async{
     try{
       final FirebaseFirestore firestore = FirebaseFirestore.instance;

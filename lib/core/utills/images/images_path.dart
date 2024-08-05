@@ -7,4 +7,7 @@ class Images {
   static const String circleImage = 'assets/svg/querter_curve_circle.svg';
 
   static const String justiceImage = 'assets/images/justice.png';
+  static const String judgeProfile = 'assets/images/judge-profile.png';
+  static const String addIcon = 'assets/svg/add_navbar_icon.svg';
+
 }
