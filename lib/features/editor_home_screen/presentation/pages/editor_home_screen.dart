@@ -341,7 +341,7 @@ class _EditorHomeScreenState extends State<EditorHomeScreen> {
                                           // Confirm the deletion
                                           Navigator.of(context).pop();
                                           // Perform the delete operation here
-                                          deleteItem();
+                                          deleteItem(caseData['case_id']);
                                         },
                                         child: const Text('حذف', style: TextStyle(color: Colors.brown),),
                                       ),
