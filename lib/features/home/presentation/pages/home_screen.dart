@@ -7,6 +7,7 @@ import 'package:judgemanager/core/firebase/firebase_repository.dart';
 import 'package:judgemanager/core/utills/helpers/functions_date/get_date.dart';
 import 'package:judgemanager/core/utills/helpers/local_database/shared_pref.dart';
 
+import '../../../../core/utills/widgets/case_widget_common.dart';
 import '../../../editor_home_screen/presentation/pages/editor_home_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -21,6 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
   String tomorrow='';
   String? phoneNumber;
 
+
   Future<void> getPhoneNumber() async {
     final phone = await SharedPrefManager.getData(AppConstant.userPhoneNumber);
     if (phone != null && phone.isNotEmpty) {
@@ -31,10 +33,42 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+
+  final List<String> _options = ['الكل','للأطلاع', 'حكم', 'تحصيل'];
+  String? _selectedProcedureValue;
+
+  void _showDropdown() {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          color: Colors.white,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: _options.map((String option) {
+              return ListTile(
+                title: Text(option),
+                onTap: () {
+                  setState(() {
+                    _selectedProcedureValue = option;
+                  });
+                  Navigator.pop(context);
+                },
+              );
+            }).toList(),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
     getPhoneNumber();
+    setState(() {
+      _selectedProcedureValue = _options[0];
+    });
   }
   @override
   Widget build(BuildContext context) {
@@ -162,21 +196,24 @@ class _HomeScreenState extends State<HomeScreen> {
 
 
                             /// filter
-                            Container(
-                              height: 60,
-                              width: 60,
-                              decoration: BoxDecoration(
-                                gradient: const LinearGradient(
-                                  colors: [Color(0xFFC67C4E), Colors.grey], // ألوان التدرج
-                                  begin: Alignment.bottomRight, // بداية التدرج
-                                  end: Alignment.topLeft, // نهاية التدرج
-                                ),
-                                borderRadius: BorderRadius.circular(25),
-                                color: const Color(0xFFC67C4E),
+                            InkWell(
+                              onTap: _showDropdown,
+                              child: Container(
+                                height: 60,
+                                width: 60,
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [Color(0xFFC67C4E), Colors.grey], // ألوان التدرج
+                                    begin: Alignment.bottomRight, // بداية التدرج
+                                    end: Alignment.topLeft, // نهاية التدرج
+                                  ),
+                                  borderRadius: BorderRadius.circular(25),
+                                  color: const Color(0xFFC67C4E),
 
-                              ),
-                              child: const Center(
-                                child: Icon(Icons.filter_alt_outlined, color: Colors.white, size: 30,),
+                                ),
+                                child: const Center(
+                                  child: Icon(Icons.filter_alt_outlined, color: Colors.white, size: 30,),
+                                ),
                               ),
                             )
                           ],
@@ -218,7 +255,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             child:  Center(
                                 child: Text(
-                                  3 == index?"اليوم":(2 == index)?"غدًا":(1 == index)?"بعد غدًا":"باقي الأيام",
+                                  0 == index?"اليوم":(1 == index)?"غدًا":(2 == index)?"بعد غدًا":"الكل",
                                   style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
@@ -238,17 +275,21 @@ class _HomeScreenState extends State<HomeScreen> {
 
             const SizedBox(height: 5,),
              const SizedBox(height: 5,),
-             (0 == _selectedIndex)
+             (3 == _selectedIndex)
                  ?Column(
                children: [
-                 _buildStream(stream: FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getTodayDate()), dayH: GetDate.getDayH(),date: GetDate.getTodayDate()),
-                 _buildStream(stream: FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getNextDay()), dayH: GetDate.getNextDayH(),date: GetDate.getNextDay()),
-                 _buildStream(stream: FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getNextNextDay()), dayH: GetDate.getNextNextDayH(), date: GetDate.getNextNextDay()),
+                 _buildStream(stream: FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getTodayDate(),procedure: _selectedProcedureValue==_options[0]?" ":_selectedProcedureValue!), dayH: GetDate.getDayH(),date: GetDate.getTodayDate()),
+                 _buildStream(stream: FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getNextDay(),procedure: _selectedProcedureValue==_options[0]?" ":_selectedProcedureValue!), dayH: GetDate.getNextDayH(),date: GetDate.getNextDay()),
+                 _buildStream(stream: FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getNextNextDay(),procedure: _selectedProcedureValue==_options[0]?" ":_selectedProcedureValue!), dayH: GetDate.getNextNextDayH(), date: GetDate.getNextNextDay()),
 
-                 _buildStream(stream: FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getNextNext1Day()), dayH: GetDate.getNextNext1DayH(),date: GetDate.getNextNext1Day()),
-                 _buildStream(stream: FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getNextNext2Day()), dayH: GetDate.getNextNext2DayH(),date: GetDate.getNextNext2Day()),
-                 _buildStream(stream: FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getNextNext3Day()), dayH: GetDate.getNextNext3DayH(), date: GetDate.getNextNext3Day()),
-                 _buildStream(stream: FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getNextNext4Day()), dayH: GetDate.getNextNext4DayH(), date: GetDate.getNextNext4Day()),
+                 _buildStream(stream: FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getNextNext1Day(),procedure: _selectedProcedureValue==_options[0]?" ":_selectedProcedureValue!), dayH: GetDate.getNextNext1DayH(),date: GetDate.getNextNext1Day()),
+                 _buildStream(stream: FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getNextNext2Day(),procedure: _selectedProcedureValue==_options[0]?" ":_selectedProcedureValue!), dayH: GetDate.getNextNext2DayH(),date: GetDate.getNextNext2Day()),
+                 _buildStream(stream: FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getNextNext3Day(),procedure: _selectedProcedureValue==_options[0]?" ":_selectedProcedureValue!), dayH: GetDate.getNextNext3DayH(), date: GetDate.getNextNext3Day()),
+                 _buildStream(stream: FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getNextNext4Day(),procedure: _selectedProcedureValue==_options[0]?" ":_selectedProcedureValue!), dayH: GetDate.getNextNext4DayH(), date: GetDate.getNextNext4Day()),
+
+                 const SizedBox(height: 20,),
+                 Text('كل القضايا ما قبل ${GetDate.getTodayDate()}', style: const TextStyle(fontWeight: FontWeight.bold),),
+                 _buildStream(stream: FirebaseRepository.getCasesBeforeDate(GetDate.getTodayDate(), phoneNumber!,procedure: _selectedProcedureValue==_options[0]?" ":_selectedProcedureValue!), dayH: GetDate.getNextNext4DayH(), date: GetDate.getNextNext4Day(), beforeYesterday: true),
 
                ],
              ):Column(
@@ -260,26 +301,26 @@ class _HomeScreenState extends State<HomeScreen> {
                          alignment: Alignment.centerRight,
                          child: Padding(
                            padding: const EdgeInsets.all(8.0),
-                           child: Text("${(1 == _selectedIndex) ?GetDate.getNextNextDayH():(2 == _selectedIndex) ?GetDate.getNextDayH()  : GetDate.getDayH()} - ${GetDate.getMonthH()} - ${GetDate.getYearH()}هـ", style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),),
+                           child: Text("${(2 == _selectedIndex) ?GetDate.getNextNextDayH():(1 == _selectedIndex) ?GetDate.getNextDayH()  : GetDate.getDayH()} - ${GetDate.getMonthH()} - ${GetDate.getYearH()}هـ", style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.deepPurple),),
                          )
                      ),
                      Align(
                          alignment: Alignment.centerLeft,
                          child: Padding(
                            padding: const EdgeInsets.all(8.0),
-                           child: Text((3 == _selectedIndex)?GetDate.getTodayDate():(2 == _selectedIndex)?GetDate.getNextDay():GetDate.getNextNextDay(), style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),),
+                           child: Text((0 == _selectedIndex)?GetDate.getTodayDate():(1 == _selectedIndex)?GetDate.getNextDay():GetDate.getNextNextDay(), style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.deepPurple),),
                          )
                      ),
                    ],
                  ),
                  StreamBuilder<QuerySnapshot>(
-                   stream: (03 == _selectedIndex)
-                       ?FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getTodayDate())
-                       : (02 == _selectedIndex)
-                       ?FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getNextDay())
-                       : (01 == _selectedIndex)
-                       ?FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getNextNextDay())
-                       :FirebaseRepository.getAllCases(phoneNumber:phoneNumber??'0'),
+                   stream: (0 == _selectedIndex)
+                       ?FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getTodayDate(),procedure: _selectedProcedureValue==_options[0]?" ":_selectedProcedureValue!)
+                       : (1 == _selectedIndex)
+                       ?FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getNextDay(),procedure: _selectedProcedureValue==_options[0]?" ":_selectedProcedureValue!)
+                       : (2 == _selectedIndex)
+                       ?FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getNextNextDay(),procedure: _selectedProcedureValue==_options[0]?" ":_selectedProcedureValue!)
+                       :FirebaseRepository.getAllCases(phoneNumber:phoneNumber??'0',procedure: _selectedProcedureValue==_options[0]?" ":_selectedProcedureValue!),
                    builder: (context, snapshot) {
                      if (snapshot.connectionState == ConnectionState.waiting) {
                        return const Center(child: CircularProgressIndicator());
@@ -290,131 +331,25 @@ class _HomeScreenState extends State<HomeScreen> {
                      }
 
                      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                       return const Center(child: Text('No cases available'));
+                       return const Center(child: Text('لا يوجد قضايا هذا اليوم'));
                      }
 
                      final List<Widget> caseWidgets = snapshot.data!.docs.map((doc) {
                        final caseData = doc.data() as Map<String, dynamic>;
 
-                       return Container(
-                         width: double.infinity, // Adjust width for better readability
-                         decoration: BoxDecoration(
-                           borderRadius: BorderRadius.circular(18),
-                           color: Colors.grey, // Background color
-                         ),
-                         padding: const EdgeInsets.all(8.0),
-                         child: Column(
-                           crossAxisAlignment: CrossAxisAlignment.end,
-                           children: [
-                             Text(
-                               caseData['case_title'] ?? 'No Title',
-                               style: const TextStyle(
-                                 fontWeight: FontWeight.bold,
-                                 color: Colors.white,
-                                 fontSize: 16.0,
-                               ),
-                               maxLines: 2,
-                               overflow: TextOverflow.ellipsis,
-                             ),
-                             const SizedBox(height: 8.0),
-                             Row(
-                               crossAxisAlignment: CrossAxisAlignment.end,
-                               children: [
-                                 Expanded(
-                                   child: Text(
-                                     caseData['appellant'] ?? 'Unknown',
-                                     style: const TextStyle(
-                                       fontWeight: FontWeight.bold,
-                                       fontSize: 16.0,
-                                       color: Colors.brown,
-                                     ),
-                                     textAlign: TextAlign.right,
-                                   ),
-                                 ),
-                                 const Text(
-                                   ' :المدعي ',
-                                   style: TextStyle(
-                                     fontWeight: FontWeight.bold,
-                                     color: Colors.black,
-                                   ),
-                                 ),
-                               ],
-                             ),
-                             const SizedBox(height: 4.0),
-                             Row(
-                               children: [
-
-                                 Expanded(
-                                   child: Text(
-                                     caseData['respondent'] ?? 'Unknown',
-                                     style: const TextStyle(
-                                       fontWeight: FontWeight.bold,
-                                       fontSize: 16.0,
-                                       color: Colors.brown,
-                                     ),
-                                     textAlign: TextAlign.right,
-                                   ),
-                                 ),
-
-                                 const Text(
-                                   ' :المدعى عليه ',
-                                   style: TextStyle(
-                                     fontWeight: FontWeight.bold,
-                                     color: Colors.black,
-                                   ),
-                                 ),
-                               ],
-                             ),
-                             const SizedBox(height: 4.0),
-                             Row(
-                               children: [
-                                 Expanded(
-                                   child: Text(
-                                     caseData['case_number'] ?? 'Unknown',
-                                     style: const TextStyle(
-                                       fontWeight: FontWeight.bold,
-                                       fontSize: 16.0,
-                                       color: Colors.brown,
-                                     ),
-                                     textAlign: TextAlign.right,
-                                   ),
-                                 ),
-                                 const Text(
-                                   ' :رقم القضية ',
-                                   style: TextStyle(
-                                     fontWeight: FontWeight.bold,
-                                     color: Colors.black,
-                                   ),
-                                 ),
-                               ],
-                             ),
-                             const SizedBox(height: 4.0),
-                             Row(
-                               children: [
-                                 Expanded(
-                                   child: Text(
-                                     caseData['procedure'] ?? 'Unknown',
-                                     style: const TextStyle(
-                                       fontWeight: FontWeight.bold,
-                                       fontSize: 16.0,
-                                       color: Colors.brown,
-                                     ),
-                                     textAlign: TextAlign.right,
-                                   ),
-                                 ),
-                                 const Text(
-                                   ' :نوع القضية ',
-                                   style: TextStyle(
-                                     fontWeight: FontWeight.bold,
-                                     color: Colors.black,
-                                   ),
-                                 ),
-                               ],
-                             ),
-
-                           ],
-                         ),
-                       );
+                       return CaseWidgetCommon(
+                           isAdmin:false,
+                           appellant: caseData['appellant'] ?? 'Unknown',
+                           caseNumber: caseData['case_number'] ?? 'Unknown',
+                           dayName: caseData['day_name'] ?? 'Unknown',
+                           isCaseStatus: caseData['case_status'] ?? false,
+                           isDelivered: caseData['delivered'] ?? false,
+                           isPaid: caseData['is_paid'] ?? false,
+                           procedure: caseData['procedure'] ?? 'Unknown',
+                           respondent: caseData['respondent'] ?? 'Unknown',
+                           sessionDate: caseData['session_date'] ?? "",
+                           sessionDateHijri: caseData['session_date_hijri']?? ' ',
+                           yearHijri: caseData['year_hijri']?? ' ');
                      }).toList();
 
                      return Padding(
@@ -436,29 +371,28 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  _buildStream({required dynamic stream, required dynamic dayH,required dynamic date}){
+  _buildStream({required dynamic stream, required dynamic dayH,required dynamic date,bool beforeYesterday = false}){
     return Column(
       children: [
-        const SizedBox(height: 10,),
-        Row(
+        !beforeYesterday?Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Align(
                 alignment: Alignment.centerRight,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Text("$dayH - ${GetDate.getMonthH()} - ${GetDate.getYearH()}هـ", style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),),
+                  child: Text("$dayH - ${GetDate.getMonthH()} - ${GetDate.getYearH()}هـ", style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.deepPurple),),
                 )
             ),
             Align(
                 alignment: Alignment.centerLeft,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Text(date, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),),
+                  child: Text(date, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.deepPurple),),
                 )
             ),
           ],
-        ),
+        ):const SizedBox.shrink(),
 
         StreamBuilder<QuerySnapshot>(
           stream: stream,
@@ -472,132 +406,62 @@ class _HomeScreenState extends State<HomeScreen> {
             }
 
             if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-              return const Center(child: Text('No cases available'));
+              return const Center(child: Text('لا يوجد قضايا هذا اليوم'));
             }
 
-            final List<Widget> caseWidgets = snapshot.data!.docs.map((doc) {
+            final List<Widget> caseWidgets = snapshot.data!.docs
+                .where((doc) {
               final caseData = doc.data() as Map<String, dynamic>;
 
-              return Container(
-                width: double.infinity, // Adjust width for better readability
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(18),
-                  color: Colors.grey, // Background color
-                ),
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      caseData['case_title'] ?? 'No Title',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: 16.0,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 8.0),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            caseData['appellant'] ?? 'Unknown',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16.0,
-                              color: Colors.brown,
-                            ),
-                            textAlign: TextAlign.right,
-                          ),
-                        ),
-                        const Text(
-                          ' :المدعي ',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4.0),
-                    Row(
-                      children: [
+              // If _selectedProcedureValue is "الكل", show all cases
+              if (_selectedProcedureValue == 'الكل') {
+                return !caseData['isDeleted'];
+              }
 
-                        Expanded(
-                          child: Text(
-                            caseData['respondent'] ?? 'Unknown',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16.0,
-                              color: Colors.brown,
-                            ),
-                            textAlign: TextAlign.right,
-                          ),
-                        ),
+              // Filter cases based on selected procedure
+              return caseData['procedure'] == _selectedProcedureValue && !caseData['isDeleted'];
+            })
+                .map((doc) {
+              final caseData = doc.data() as Map<String, dynamic>;
 
-                        const Text(
-                          ' :المدعى عليه ',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4.0),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            caseData['case_number'] ?? 'Unknown',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16.0,
-                              color: Colors.brown,
-                            ),
-                            textAlign: TextAlign.right,
-                          ),
-                        ),
-                        const Text(
-                          ' :رقم القضية ',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4.0),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            caseData['procedure'] ?? 'Unknown',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16.0,
-                              color: Colors.brown,
-                            ),
-                            textAlign: TextAlign.right,
-                          ),
-                        ),
-                        const Text(
-                          ' :نوع القضية ',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ],
-                    ),
-
-                  ],
-                ),
+              return CaseWidgetCommon(
+                isAdmin: false,
+                appellant: caseData['appellant'] ?? 'Unknown',
+                caseNumber: caseData['case_number'] ?? 'Unknown',
+                dayName: caseData['day_name'] ?? 'Unknown',
+                isCaseStatus: caseData['case_status'] ?? false,
+                isDelivered: caseData['delivered'] ?? false,
+                isPaid: caseData['is_paid'] ?? false,
+                procedure: caseData['procedure'] ?? 'Unknown',
+                respondent: caseData['respondent'] ?? 'Unknown',
+                sessionDate: caseData['session_date'] ?? "",
+                sessionDateHijri: caseData['session_date_hijri'] ?? ' ',
+                yearHijri: caseData['year_hijri'] ?? ' ',
               );
             }).toList();
+            // final List<Widget> caseWidgets = snapshot.data!.docs.map((doc) {
+            //   final caseData = doc.data() as Map<String, dynamic>;
+            //
+            //   List<Map<String, dynamic>> filteredCases = caseData.where((caseData) {
+            //     return caseData['procedure'] == _selectedProcedureValue;
+            //   }).toList();
+            //   return caseData['isDeleted']
+            //       ?SizedBox.shrink()
+            //       :_selectedProcedureValue==_options[0]
+            //       ?CaseWidgetCommon(
+            //     isAdmin:false,
+            //     appellant: caseData['appellant'] ?? 'Unknown',
+            //     caseNumber: caseData['case_number'] ?? 'Unknown',
+            //     dayName: caseData['day_name'] ?? 'Unknown',
+            //     isCaseStatus: caseData['case_status'] ?? false,
+            //     isDelivered: caseData['delivered'] ?? false,
+            //     isPaid: caseData['is_paid'] ?? false,
+            //     procedure: caseData['procedure'] ?? 'Unknown',
+            //     respondent: caseData['respondent'] ?? 'Unknown',
+            //     sessionDate: caseData['session_date'] ?? "",
+            //     sessionDateHijri: caseData['session_date_hijri']?? ' ',
+            //     yearHijri: caseData['year_hijri']?? ' '):;
+            // }).toList();
 
             return Padding(
               padding: const EdgeInsets.all(8.0),

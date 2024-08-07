@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:judgemanager/core/utills/helpers/local_database/shared_pref.dart';
+import 'package:judgemanager/core/utills/widgets/case_widget_common.dart';
 import 'package:judgemanager/features/splash/splash_screen.dart';
 import 'package:provider/provider.dart';
 import 'features/login/presentation/provider/login_provider.dart';
@@ -46,9 +47,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return   ChangeNotifierProvider<LoginProvider>(
       create: (context) => LoginProvider(),
-      child: const GetMaterialApp(
+      child:  const GetMaterialApp(
         title: 'Judge App',
-        home: SplashScreen(),
+        home: SplashScreen()
       ),
     );
   }
