@@ -1,5 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:judgemanager/core/firebase/firebase_repository.dart';
+
+import '../../../features/edit_case/persentation/pages/edit_case.dart';
 
 class CaseWidgetCommon extends StatefulWidget {
   CaseWidgetCommon({
@@ -45,148 +48,166 @@ class _CaseWidgetCommonState extends State<CaseWidgetCommon> {
   Widget build(BuildContext context) {
     return Stack(
         children: [
-          Card(
-            child:Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          widget.caseNumber,
-                          textAlign: TextAlign.right,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold, // Make this text bold
-                          ),
-                        ),
-                      ),
-                      const Text(
-                        "  :رقم القضية",
-                        style: TextStyle(
-                            color: Colors.brown, // Use a lighter color for readability
-                            fontSize: 16
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8), // Add spacing between rows
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          "هـ ${widget.yearHijri}",
-                          textAlign: TextAlign.right,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold, // Make this text bold
-                          ),
-                        ),
-                      ),
-                      const Text(
-                        "  :لسنة",
-                        style: TextStyle(
-                            color: Colors.brown, // Use a lighter color for readability
-                            fontSize: 16
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          widget.procedure,
-                          textAlign: TextAlign.right,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold, // Make this text bold
-                          ),
-                        ),
-                      ),
-                      const Text(
-                        "  :قرار الجلسة",
-                        style: TextStyle(
-                          color: Colors.brown, // Use a lighter color for readability
-                          fontSize: 16
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          widget.appellant,
-                          textAlign: TextAlign.right,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold, // Make this text bold
-                          ),
-                        ),
-                      ),
-                      const Text(
-                        "  :المستأنف",
-                        style: TextStyle(
-                            color: Colors.brown, // Use a lighter color for readability
-                            fontSize: 16
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          widget.respondent,
-                          textAlign: TextAlign.right,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold, // Make this text bold
-                          ),
-                        ),
-                      ),
-                      const Text(
-                        "  :المستأنف ضده",
-                        style: TextStyle(
-                            color: Colors.brown, // Use a lighter color for readability
-                            fontSize: 16
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                       Expanded(
-                        child: Text(
-                          "${widget.dayName}   ${widget.sessionDateHijri}   ${widget.sessionDate}",
-                          textAlign: TextAlign.right,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold, // Make this text bold
-                          ),
-                        ),
-                      ),
-                      const Text(
-                        "  :موعد الجلسة",
-                        style: TextStyle(
-                            color: Colors.brown, // Use a lighter color for readability
-                            fontSize: 16
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+          Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: widget.isCaseStatus?Colors.green:Colors.redAccent, width: 2.0), // Red border
+                borderRadius: BorderRadius.circular(10.0), // Same border radius as the Card
               ),
-            )
+              child: InkWell(
+                onTap: (){
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=>EditCase()));
+                },
+                child: Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4.0), // Ensure the border radius matches
+                    ),
+
+                  child:Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                widget.caseNumber,
+                                textAlign: TextAlign.right,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold, // Make this text bold
+                                ),
+                              ),
+                            ),
+                            const Text(
+                              "  :رقم القضية",
+                              style: TextStyle(
+                                  color: Colors.brown, // Use a lighter color for readability
+                                  fontSize: 16
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8), // Add spacing between rows
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                "هـ ${widget.yearHijri}",
+                                textAlign: TextAlign.right,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold, // Make this text bold
+                                ),
+                              ),
+                            ),
+                            const Text(
+                              "  :لسنة",
+                              style: TextStyle(
+                                  color: Colors.brown, // Use a lighter color for readability
+                                  fontSize: 16
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                widget.procedure,
+                                textAlign: TextAlign.right,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold, // Make this text bold
+                                ),
+                              ),
+                            ),
+                            const Text(
+                              "  :قرار الجلسة",
+                              style: TextStyle(
+                                color: Colors.brown, // Use a lighter color for readability
+                                fontSize: 16
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                widget.appellant,
+                                textAlign: TextAlign.right,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold, // Make this text bold
+                                ),
+                              ),
+                            ),
+                            const Text(
+                              "  :المستأنف",
+                              style: TextStyle(
+                                  color: Colors.brown, // Use a lighter color for readability
+                                  fontSize: 16
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                widget.respondent,
+                                textAlign: TextAlign.right,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold, // Make this text bold
+                                ),
+                              ),
+                            ),
+                            const Text(
+                              "  :المستأنف ضده",
+                              style: TextStyle(
+                                  color: Colors.brown, // Use a lighter color for readability
+                                  fontSize: 16
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                             Expanded(
+                              child: Text(
+                                "${widget.dayName}   ${widget.sessionDateHijri}   ${widget.sessionDate}",
+                                textAlign: TextAlign.right,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold, // Make this text bold
+                                ),
+                              ),
+                            ),
+                            const Text(
+                              "  :موعد الجلسة",
+                              style: TextStyle(
+                                  color: Colors.brown, // Use a lighter color for readability
+                                  fontSize: 16
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  )
 
 
+                ),
+              ),
+            ),
           ),
 
 
@@ -225,8 +246,8 @@ class _CaseWidgetCommonState extends State<CaseWidgetCommon> {
             ),
           ),
 
-          Positioned(
-              top: 55,
+          (widget.procedure != 'للأطلاع' && widget.procedure != 'حكم')?Positioned(
+              top: 90,
               left: 20,
               child: InkWell(
                 onTap: widget.isPaidFunction,
@@ -255,10 +276,10 @@ class _CaseWidgetCommonState extends State<CaseWidgetCommon> {
                 ),
               ),
             ),
-          ),
+          ):SizedBox(),
 
           widget.isAdmin?Positioned(
-              top: 90,
+              top: 55,
               left: 20,
               child: InkWell(
                 onTap: widget.isCaseStatusFunction,

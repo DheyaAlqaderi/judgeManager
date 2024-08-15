@@ -380,4 +380,14 @@ class GetDate {
     return hijriYear.toString();
   }
 
+  static String convertToHijri(DateTime gregorianDate) {
+    HijriCalendar.setLocal("ar");
+    HijriCalendar hijriDate = HijriCalendar.fromDate(gregorianDate);
+    final hijriYear = hijriDate.hYear;
+    final hijriMonth = hijriDate.hMonth;
+    final hijriDay = hijriDate.hDay;
+
+    return ' هـ$hijriYear - $hijriMonth - $hijriDay ';
+  }
+
 }

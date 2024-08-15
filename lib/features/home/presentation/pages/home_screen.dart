@@ -2,11 +2,12 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:hijri/hijri_calendar.dart';
 import 'package:judgemanager/core/constant/app_constant.dart';
 import 'package:judgemanager/core/firebase/firebase_repository.dart';
 import 'package:judgemanager/core/utills/helpers/functions_date/get_date.dart';
 import 'package:judgemanager/core/utills/helpers/local_database/shared_pref.dart';
-
+import 'package:collection/collection.dart';
 import '../../../../core/utills/widgets/case_widget_common.dart';
 import '../../../editor_home_screen/presentation/pages/editor_home_screen.dart';
 
@@ -278,18 +279,19 @@ class _HomeScreenState extends State<HomeScreen> {
              (3 == _selectedIndex)
                  ?Column(
                children: [
-                 _buildStream(stream: FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getTodayDate(),procedure: _selectedProcedureValue==_options[0]?" ":_selectedProcedureValue!), dayH: GetDate.getDayH(),date: GetDate.getTodayDate()),
-                 _buildStream(stream: FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getNextDay(),procedure: _selectedProcedureValue==_options[0]?" ":_selectedProcedureValue!), dayH: GetDate.getNextDayH(),date: GetDate.getNextDay()),
-                 _buildStream(stream: FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getNextNextDay(),procedure: _selectedProcedureValue==_options[0]?" ":_selectedProcedureValue!), dayH: GetDate.getNextNextDayH(), date: GetDate.getNextNextDay()),
+                 // _buildStream(stream: FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getTodayDate(),procedure: _selectedProcedureValue==_options[0]?" ":_selectedProcedureValue!), dayH: GetDate.getDayH(),date: GetDate.getTodayDate()),
+                 _buildStream(stream: FirebaseRepository.getAllCases(phoneNumber: phoneNumber!), dayH: GetDate.getDayH(),date: GetDate.getTodayDate()),
+                 // _buildStream(stream: FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getNextDay(),procedure: _selectedProcedureValue==_options[0]?" ":_selectedProcedureValue!), dayH: GetDate.getNextDayH(),date: GetDate.getNextDay()),
+                 // _buildStream(stream: FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getNextNextDay(),procedure: _selectedProcedureValue==_options[0]?" ":_selectedProcedureValue!), dayH: GetDate.getNextNextDayH(), date: GetDate.getNextNextDay()),
+                 //
+                 // _buildStream(stream: FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getNextNext1Day(),procedure: _selectedProcedureValue==_options[0]?" ":_selectedProcedureValue!), dayH: GetDate.getNextNext1DayH(),date: GetDate.getNextNext1Day()),
+                 // _buildStream(stream: FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getNextNext2Day(),procedure: _selectedProcedureValue==_options[0]?" ":_selectedProcedureValue!), dayH: GetDate.getNextNext2DayH(),date: GetDate.getNextNext2Day()),
+                 // _buildStream(stream: FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getNextNext3Day(),procedure: _selectedProcedureValue==_options[0]?" ":_selectedProcedureValue!), dayH: GetDate.getNextNext3DayH(), date: GetDate.getNextNext3Day()),
+                 // _buildStream(stream: FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getNextNext4Day(),procedure: _selectedProcedureValue==_options[0]?" ":_selectedProcedureValue!), dayH: GetDate.getNextNext4DayH(), date: GetDate.getNextNext4Day()),
 
-                 _buildStream(stream: FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getNextNext1Day(),procedure: _selectedProcedureValue==_options[0]?" ":_selectedProcedureValue!), dayH: GetDate.getNextNext1DayH(),date: GetDate.getNextNext1Day()),
-                 _buildStream(stream: FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getNextNext2Day(),procedure: _selectedProcedureValue==_options[0]?" ":_selectedProcedureValue!), dayH: GetDate.getNextNext2DayH(),date: GetDate.getNextNext2Day()),
-                 _buildStream(stream: FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getNextNext3Day(),procedure: _selectedProcedureValue==_options[0]?" ":_selectedProcedureValue!), dayH: GetDate.getNextNext3DayH(), date: GetDate.getNextNext3Day()),
-                 _buildStream(stream: FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getNextNext4Day(),procedure: _selectedProcedureValue==_options[0]?" ":_selectedProcedureValue!), dayH: GetDate.getNextNext4DayH(), date: GetDate.getNextNext4Day()),
-
-                 const SizedBox(height: 20,),
-                 Text('كل القضايا ما قبل ${GetDate.getTodayDate()}', style: const TextStyle(fontWeight: FontWeight.bold),),
-                 _buildStream(stream: FirebaseRepository.getCasesBeforeDate(GetDate.getTodayDate(), phoneNumber!,procedure: _selectedProcedureValue==_options[0]?" ":_selectedProcedureValue!), dayH: GetDate.getNextNext4DayH(), date: GetDate.getNextNext4Day(), beforeYesterday: true),
+                 // const SizedBox(height: 20,),
+                 // Text('كل القضايا ما قبل ${GetDate.getTodayDate()}', style: const TextStyle(fontWeight: FontWeight.bold),),
+                 // _buildStream(stream: FirebaseRepository.getCasesBeforeDate(GetDate.getTodayDate(), phoneNumber!,procedure: _selectedProcedureValue==_options[0]?" ":_selectedProcedureValue!), dayH: GetDate.getNextNext4DayH(), date: GetDate.getNextNext4Day(), beforeYesterday: true),
 
                ],
              ):Column(
@@ -331,14 +333,14 @@ class _HomeScreenState extends State<HomeScreen> {
                      }
 
                      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                       return const Center(child: Text('لا يوجد قضايا هذا اليوم'));
+                       return const SizedBox();
                      }
 
                      final List<Widget> caseWidgets = snapshot.data!.docs.map((doc) {
                        final caseData = doc.data() as Map<String, dynamic>;
 
                        return CaseWidgetCommon(
-                           isAdmin:false,
+                           isAdmin:true,
                            appellant: caseData['appellant'] ?? 'Unknown',
                            caseNumber: caseData['case_number'] ?? 'Unknown',
                            dayName: caseData['day_name'] ?? 'Unknown',
@@ -374,26 +376,25 @@ class _HomeScreenState extends State<HomeScreen> {
   _buildStream({required dynamic stream, required dynamic dayH,required dynamic date,bool beforeYesterday = false}){
     return Column(
       children: [
-        !beforeYesterday?Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Align(
-                alignment: Alignment.centerRight,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text("$dayH - ${GetDate.getMonthH()} - ${GetDate.getYearH()}هـ", style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.deepPurple),),
-                )
-            ),
-            Align(
-                alignment: Alignment.centerLeft,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(date, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.deepPurple),),
-                )
-            ),
-          ],
-        ):const SizedBox.shrink(),
-
+        // !beforeYesterday?Row(
+        //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        //   children: [
+        //     Align(
+        //         alignment: Alignment.centerRight,
+        //         child: Padding(
+        //           padding: const EdgeInsets.all(8.0),
+        //           child: Text("$dayH - ${GetDate.getMonthH()} - ${GetDate.getYearH()}هـ", style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.deepPurple),),
+        //         )
+        //     ),
+        //     Align(
+        //         alignment: Alignment.centerLeft,
+        //         child: Padding(
+        //           padding: const EdgeInsets.all(8.0),
+        //           child: Text(date, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.deepPurple),),
+        //         )
+        //     ),
+        //   ],
+        // ):const SizedBox.shrink(),
         StreamBuilder<QuerySnapshot>(
           stream: stream,
           builder: (context, snapshot) {
@@ -409,59 +410,132 @@ class _HomeScreenState extends State<HomeScreen> {
               return const Center(child: Text('لا يوجد قضايا هذا اليوم'));
             }
 
-            final List<Widget> caseWidgets = snapshot.data!.docs
-                .where((doc) {
+            // Filter cases based on selected procedure
+            final cases = snapshot.data!.docs.where((doc) {
               final caseData = doc.data() as Map<String, dynamic>;
 
-              // If _selectedProcedureValue is "الكل", show all cases
               if (_selectedProcedureValue == 'الكل') {
                 return !caseData['isDeleted'];
               }
 
-              // Filter cases based on selected procedure
               return caseData['procedure'] == _selectedProcedureValue && !caseData['isDeleted'];
-            })
-                .map((doc) {
-              final caseData = doc.data() as Map<String, dynamic>;
-
-              return CaseWidgetCommon(
-                isAdmin: false,
-                appellant: caseData['appellant'] ?? 'Unknown',
-                caseNumber: caseData['case_number'] ?? 'Unknown',
-                dayName: caseData['day_name'] ?? 'Unknown',
-                isCaseStatus: caseData['case_status'] ?? false,
-                isDelivered: caseData['delivered'] ?? false,
-                isPaid: caseData['is_paid'] ?? false,
-                procedure: caseData['procedure'] ?? 'Unknown',
-                respondent: caseData['respondent'] ?? 'Unknown',
-                sessionDate: caseData['session_date'] ?? "",
-                sessionDateHijri: caseData['session_date_hijri'] ?? ' ',
-                yearHijri: caseData['year_hijri'] ?? ' ',
-              );
             }).toList();
-            // final List<Widget> caseWidgets = snapshot.data!.docs.map((doc) {
-            //   final caseData = doc.data() as Map<String, dynamic>;
-            //
-            //   List<Map<String, dynamic>> filteredCases = caseData.where((caseData) {
-            //     return caseData['procedure'] == _selectedProcedureValue;
-            //   }).toList();
-            //   return caseData['isDeleted']
-            //       ?SizedBox.shrink()
-            //       :_selectedProcedureValue==_options[0]
-            //       ?CaseWidgetCommon(
-            //     isAdmin:false,
-            //     appellant: caseData['appellant'] ?? 'Unknown',
-            //     caseNumber: caseData['case_number'] ?? 'Unknown',
-            //     dayName: caseData['day_name'] ?? 'Unknown',
-            //     isCaseStatus: caseData['case_status'] ?? false,
-            //     isDelivered: caseData['delivered'] ?? false,
-            //     isPaid: caseData['is_paid'] ?? false,
-            //     procedure: caseData['procedure'] ?? 'Unknown',
-            //     respondent: caseData['respondent'] ?? 'Unknown',
-            //     sessionDate: caseData['session_date'] ?? "",
-            //     sessionDateHijri: caseData['session_date_hijri']?? ' ',
-            //     yearHijri: caseData['year_hijri']?? ' '):;
-            // }).toList();
+
+            // Sort cases by session_date
+            cases.sort((a, b) {
+              final aDate = DateTime.parse((a.data() as Map<String, dynamic>)['session_date'] ?? '1970-01-01');
+              final bDate = DateTime.parse((b.data() as Map<String, dynamic>)['session_date'] ?? '1970-01-01');
+              return aDate.compareTo(bDate);
+            });
+
+            // Separate cases into today's cases, future cases, and past cases
+            final now = DateTime.now();
+            final todayCases = <QueryDocumentSnapshot>[];
+            final futureCases = <QueryDocumentSnapshot>[];
+            final pastCases = <QueryDocumentSnapshot>[];
+
+            for (var doc in cases) {
+              final sessionDate = DateTime.parse((doc.data() as Map<String, dynamic>)['session_date'] ?? '1970-01-01');
+              if (sessionDate.isAtSameMomentAs(DateTime(now.year, now.month, now.day))) {
+                todayCases.add(doc);
+              } else if (sessionDate.isAfter(now)) {
+                futureCases.add(doc);
+              } else {
+                pastCases.add(doc);
+              }
+            }
+
+            // Function to build case widgets
+            List<Widget> buildCaseWidgets(List<QueryDocumentSnapshot> caseDocs) {
+              final groupedCases = groupBy(caseDocs, (doc) {
+                final caseData = doc.data() as Map<String, dynamic>;
+                return caseData['session_date'] ?? 'Unknown';
+              });
+
+              final List<Widget> caseWidgets = [];
+              groupedCases.forEach((sessionDate, docs) {
+                final sessionDateTime = DateTime.parse(sessionDate);
+                caseWidgets.add(
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Align(
+                              alignment: Alignment.centerRight,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  convertToHijri(sessionDateTime),
+                                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.deepPurple),
+                                ),
+                              )),
+                          Align(
+                              alignment: Alignment.centerLeft,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  sessionDate,
+                                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.deepPurple),
+                                ),
+                              )),
+                        ],
+                      ),
+                      ...docs.map((doc) {
+                        final caseData = doc.data() as Map<String, dynamic>;
+                        return CaseWidgetCommon(
+                          isAdmin: true,
+                          appellant: caseData['appellant'] ?? 'Unknown',
+                          caseNumber: caseData['case_number'] ?? 'Unknown',
+                          dayName: caseData['day_name'] ?? 'Unknown',
+                          isCaseStatus: caseData['case_status'] ?? false,
+                          isDelivered: caseData['delivered'] ?? false,
+                          isPaid: caseData['is_paid'] ?? false,
+                          procedure: caseData['procedure'] ?? 'Unknown',
+                          respondent: caseData['respondent'] ?? 'Unknown',
+                          sessionDate: caseData['session_date'] ?? "",
+                          sessionDateHijri: caseData['session_date_hijri'] ?? ' ',
+                          yearHijri: caseData['year_hijri'] ?? ' ',
+                          deleteItem: () async {
+                            await FirebaseRepository.updateIsDeliveredIsPaidCaseState(
+                                caseId: caseData['case_id'],
+                                isBool: caseData['isDeleted'] ? true : true,
+                                fieldName: 'isDeleted');
+                          },
+                          isDeliveredFunction: () async {
+                            await FirebaseRepository.updateIsDeliveredIsPaidCaseState(
+                                caseId: caseData['case_id'],
+                                isBool: caseData['delivered'] ? false : true,
+                                fieldName: 'delivered');
+                          },
+                          isPaidFunction: () async {
+                            await FirebaseRepository.updateIsDeliveredIsPaidCaseState(
+                                caseId: caseData['case_id'],
+                                isBool: caseData['is_paid'] ? false : true,
+                                fieldName: 'is_paid');
+                          },
+                          isCaseStatusFunction: () async {
+                            await FirebaseRepository.updateIsDeliveredIsPaidCaseState(
+                                caseId: caseData['case_id'],
+                                isBool: caseData['case_status']?false:true,
+                                fieldName: 'case_status'
+                            );
+                          },
+                        );
+                      }).toList(),
+                    ],
+                  ),
+                );
+              });
+              return caseWidgets;
+            }
+
+            final List<Widget> caseWidgets = [
+              ...buildCaseWidgets(todayCases),
+              ...buildCaseWidgets(futureCases),
+              ...buildCaseWidgets(pastCases),
+            ];
 
             return Padding(
               padding: const EdgeInsets.all(8.0),
@@ -472,8 +546,19 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             );
           },
-        ),
+        )
       ],
     );
+  }
+  String convertToHijri(DateTime gregorianDate) {
+    HijriCalendar.setLocal("ar");
+    HijriCalendar hijriDate = HijriCalendar.fromDate(gregorianDate);
+    final hijriYear = hijriDate.hYear;
+    final hijriMonth = hijriDate.hMonth;
+    final hijriMonthN = hijriDate.getLongMonthName(); // Get month name in Arabic
+    final hijriDay = hijriDate.hDay;
+    final hijriDayN = hijriDate.getDayName();
+
+    return '$hijriYear - $hijriMonth - $hijriDay   ($hijriDayN - $hijriMonthN)';
   }
 }

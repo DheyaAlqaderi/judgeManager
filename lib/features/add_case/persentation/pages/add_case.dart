@@ -99,6 +99,7 @@ class _AddCaseState extends State<AddCase> {
                     hintText: 'أدخل تاريخ الحكم مثل 10-08-2024',
                     validator: _validateDate,
                   ),
+                  _buildNumberField(controller: _yearController, label: "السنة", hintText: "ادخل السنة"),
                   _buildDropdown(
                     value: _selectedProcedure,
                     items: ['تحصيل', 'للأطلاع', 'حكم'],
@@ -256,7 +257,6 @@ class _AddCaseState extends State<AddCase> {
             setState(() {
               _sessionDateHijriController.text = formattedDate;
               _dayNameController.text = hijriDate.getDayName();
-              _yearController.text = hijriDate.hYear.toString();
             });
           }
         },
