@@ -119,6 +119,7 @@ class _EditCaseState extends State<EditCase> {
                       style: TextStyle(fontSize: 11),
                     ),
                   ),
+
                   const SizedBox(height: 5,),
                   _buildTextFieldDate(
                     context: context,
