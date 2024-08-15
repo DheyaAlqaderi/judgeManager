@@ -20,19 +20,21 @@ class GetDate {
     final now = DateTime.now().add(const Duration(days: 3));
     return '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
   }
+
   static String getNextNext2Day() {
     final now = DateTime.now().add(const Duration(days: 4));
     return '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
   }
+
   static String getNextNext3Day() {
     final now = DateTime.now().add(const Duration(days: 5));
     return '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
   }
+
   static String getNextNext4Day() {
     final now = DateTime.now().add(const Duration(days: 6));
     return '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
   }
-
 
   static String getNextDayDateH() {
     final now = DateTime.now();
@@ -117,6 +119,7 @@ class GetDate {
 
     return dayName;
   }
+
   static String getNextNext2DayH() {
     // Get the current date and time
     DateTime now = DateTime.now();
@@ -155,6 +158,7 @@ class GetDate {
 
     return dayName;
   }
+
   static String getNextNext3DayH() {
     // Get the current date and time
     DateTime now = DateTime.now();
@@ -193,6 +197,7 @@ class GetDate {
 
     return dayName;
   }
+
   static String getNextNext4DayH() {
     // Get the current date and time
     DateTime now = DateTime.now();
@@ -273,7 +278,7 @@ class GetDate {
     return dayName;
   }
 
-  static String getDayH(){
+  static String getDayH() {
     // Get the current date and time
     DateTime now = DateTime.now();
 
@@ -311,7 +316,7 @@ class GetDate {
     return dayName;
   }
 
-  static String getMonthH(){
+  static String getMonthH() {
     // Get the current Gregorian date
     DateTime now = DateTime.now();
 
@@ -368,7 +373,7 @@ class GetDate {
     return hijriMonthName;
   }
 
-  static String getYearH(){
+  static String getYearH() {
     // Get the current Gregorian date
     DateTime now = DateTime.now();
 
@@ -379,5 +384,4 @@ class GetDate {
     // Print the current Hijri month
     return hijriYear.toString();
   }
-
 }

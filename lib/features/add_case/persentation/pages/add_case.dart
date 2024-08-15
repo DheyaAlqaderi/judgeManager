@@ -22,7 +22,7 @@ class _AddCaseState extends State<AddCase> {
   final _judgmentDateController = TextEditingController();
   final _yearController = TextEditingController();
   final _dayNameController = TextEditingController();
-
+  // final _hijriyearController = TextEditingController();
 
   String _selectedProcedure = 'تحصيل';
   String _selectedCaseType = 'مدني';
@@ -36,8 +36,7 @@ class _AddCaseState extends State<AddCase> {
   @override
   void initState() {
     super.initState();
-    _yearController.text =HijriCalendar.now().hYear.toString();
-
+    // _yearController.text = HijriCalendar.now().hYear.toString();
   }
 
   @override
@@ -62,14 +61,14 @@ class _AddCaseState extends State<AddCase> {
                   ),
                   _buildTextField(
                     controller: _appellantController,
-                    label: 'المدعي',
-                    hintText: 'أدخل اسم المدعي',
+                    label: 'المستأنف',
+                    hintText: 'أدخل اسم المستأنف',
                     validator: _validateRequired,
                   ),
                   _buildTextField(
                     controller: _respondentController,
-                    label: 'المدعى عليه',
-                    hintText: 'أدخل اسم المدعى عليه',
+                    label: 'المستأنف ضده',
+                    hintText: 'أدخل اسم المستأنف ضده',
                     validator: _validateRequired,
                   ),
                   _buildNumberField(
@@ -78,20 +77,29 @@ class _AddCaseState extends State<AddCase> {
                     hintText: 'أدخل رقم القضية',
                     validator: _validateRequired,
                   ),
+                  _buildNumberField(
+                    controller: _yearController,
+                    label: 'لسنـة',
+                    hintText: 'أدخل سنة القضية مثل 1445',
+                    validator: _validateRequired,
+                  ),
+
                   _buildTextField(
                     controller: _writerController,
                     label: 'الكاتب',
                     hintText: 'أدخل اسم الكاتب',
                   ),
-
-                  const Center(child: Text('سيتم ادخال التاريخ الهجري اوتماتيكي ماعليك سوى إدخال التاريخ الميلادي', style: TextStyle(fontSize: 11),)),
+                  // const Center(
+                  //     child: Text(
+                  //   'سيتم ادخال التاريخ الهجري اوتماتيكي ماعليك سوى إدخال التاريخ الميلادي',
+                  //   style: TextStyle(fontSize: 11),
+                  // )),
                   _buildTextFieldDate(
-                    context: context,
-                    label: 'اختر التاريخ الميلادي للجلسة',
-                    controller: _sessionDateController,
-                    hintText: '(YYYY-MM-DD) أدخل التاريخ الميلادي للجلسة ',
-                    validator: _validateDate
-                  ),
+                      context: context,
+                      label: 'اختر التاريخ الميلادي للجلسة',
+                      controller: _sessionDateController,
+                      hintText: '(YYYY-MM-DD) أدخل التاريخ الميلادي للجلسة ',
+                      validator: _validateDate),
                   _buildTextFieldDate(
                     context: context,
                     controller: _judgmentDateController,
@@ -119,7 +127,6 @@ class _AddCaseState extends State<AddCase> {
                     },
                     label: 'نوع القضية',
                   ),
-
                   Visibility(
                     visible: false,
                     child: _buildTextField(
@@ -174,7 +181,8 @@ class _AddCaseState extends State<AddCase> {
                       backgroundColor: Colors.brown,
                       padding: const EdgeInsets.symmetric(vertical: 16.0),
                     ),
-                    child: const Text('إضافة قضية', style: TextStyle(fontSize: 16, color: Colors.white)),
+                    child: const Text('إضافة قضية',
+                        style: TextStyle(fontSize: 16, color: Colors.white)),
                   ),
                 ],
               ),
@@ -184,7 +192,6 @@ class _AddCaseState extends State<AddCase> {
       ),
     );
   }
-
 
   Widget _buildTextField({
     required String label,
@@ -204,7 +211,8 @@ class _AddCaseState extends State<AddCase> {
           labelText: label,
           hintText: hintText,
           border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+          contentPadding:
+              const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
         ),
         validator: validator,
       ),
@@ -230,7 +238,8 @@ class _AddCaseState extends State<AddCase> {
           labelText: label,
           hintText: hintText,
           border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+          contentPadding:
+              const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
         ),
         validator: validator,
         onTap: () async {
@@ -249,20 +258,21 @@ class _AddCaseState extends State<AddCase> {
             // Convert to Hijri date
             final hijriDate = HijriCalendar.fromDate(pickedDate);
             // Format the Hijri date as YYYY-MM-DD
-            final formattedDate = "${hijriDate.hYear}-${hijriDate.hMonth.toString().padLeft(2, '0')}-${hijriDate.hDay.toString().padLeft(2, '0')}";
-
+            final formattedDate =
+                "${hijriDate.hYear}-${hijriDate.hMonth.toString().padLeft(2, '0')}-${hijriDate.hDay.toString().padLeft(2, '0')}";
 
             // Update the text field with the Hijri date
             setState(() {
               _sessionDateHijriController.text = formattedDate;
               _dayNameController.text = hijriDate.getDayName();
-              _yearController.text = hijriDate.hYear.toString();
+              // _yearController.text = hijriDate.hYear.toString();
             });
           }
         },
       ),
     );
   }
+
   Widget _buildNumberField({
     required TextEditingController controller,
     required String label,
@@ -278,7 +288,8 @@ class _AddCaseState extends State<AddCase> {
           labelText: label,
           hintText: hintText,
           border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+          contentPadding:
+              const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
         ),
         validator: validator,
       ),
@@ -305,7 +316,8 @@ class _AddCaseState extends State<AddCase> {
         decoration: InputDecoration(
           labelText: label,
           border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+          contentPadding:
+              const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
         ),
       ),
     );
@@ -319,7 +331,9 @@ class _AddCaseState extends State<AddCase> {
   }
 
   String? _validateDate(String? value) {
-    if (value == null || value.isEmpty || !RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(value)) {
+    if (value == null ||
+        value.isEmpty ||
+        !RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(value)) {
       return 'يرجى إدخال تاريخ صحيح بصيغة YYYY-MM-DD';
     }
     return null;
@@ -354,12 +368,16 @@ class _AddCaseState extends State<AddCase> {
 
       try {
         await newCaseRef.set(caseData);
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تمت إضافة القضية بنجاح')));
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('تمت إضافة القضية بنجاح')));
         _formKey.currentState?.reset();
-        _yearController.text = DateTime.now().year.toString(); // Reset the year to the current year
+        // _yearController.text = DateTime.now()
+        //     .year
+        //     .toString(); // Reset the year to the current year
         Navigator.pop(context);
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to add case: $e')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Failed to add case: $e')));
       }
     }
   }

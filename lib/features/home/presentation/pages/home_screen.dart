@@ -1,5 +1,3 @@
-
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:judgemanager/core/constant/app_constant.dart';
@@ -19,9 +17,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 3;
-  String tomorrow='';
+  String tomorrow = '';
   String? phoneNumber;
-
 
   Future<void> getPhoneNumber() async {
     final phone = await SharedPrefManager.getData(AppConstant.userPhoneNumber);
@@ -33,8 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-
-  final List<String> _options = ['الكل','للأطلاع', 'حكم', 'تحصيل'];
+  final List<String> _options = ['الكل', 'للأطلاع', 'حكم', 'تحصيل'];
   String? _selectedProcedureValue;
 
   void _showDropdown() {
@@ -70,21 +66,22 @@ class _HomeScreenState extends State<HomeScreen> {
       _selectedProcedureValue = _options[0];
     });
   }
+
   @override
   Widget build(BuildContext context) {
     // Check if phoneNumber is null
     if (phoneNumber == null) {
-      return const Center(child: CircularProgressIndicator()); // Or any other placeholder widget
+      return const Center(
+          child:
+              CircularProgressIndicator()); // Or any other placeholder widget
     }
     return Scaffold(
       body: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: Column(
           children: [
-
             Stack(
               children: [
-
                 Container(
                   height: 250,
                   width: double.infinity,
@@ -95,13 +92,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       end: Alignment.topLeft, // نهاية التدرج
                     ),
                     borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(20), // تحديد نصف قطر الزاوية السفلية اليسرى
-                      bottomRight: Radius.circular(20), // تحديد نصف قطر الزاوية السفلية اليمنى
+                      bottomLeft: Radius.circular(
+                          20), // تحديد نصف قطر الزاوية السفلية اليسرى
+                      bottomRight: Radius.circular(
+                          20), // تحديد نصف قطر الزاوية السفلية اليمنى
                     ),
                   ),
                 ),
-
-
                 Positioned(
                   top: 0,
                   right: 0,
@@ -111,34 +108,54 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const SizedBox(height: 40,),
+                        const SizedBox(
+                          height: 40,
+                        ),
                         StreamBuilder(
-                            stream:  FirebaseRepository.getJudgeDocument(phoneNumber!),
-                            builder:(context, snapshot){
-                              if (snapshot.connectionState == ConnectionState.waiting) {
-                                return const Center(child: CircularProgressIndicator());
+                            stream: FirebaseRepository.getJudgeDocument(
+                                phoneNumber!),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return const Center(
+                                    child: CircularProgressIndicator());
                               }
 
                               if (snapshot.hasError) {
-                                return Center(child: Text('Error: ${snapshot.error}'));
+                                return Center(
+                                    child: Text('Error: ${snapshot.error}'));
                               }
 
                               if (!snapshot.hasData || !snapshot.data!.exists) {
-                                return const Center(child: Text('No data available'));
+                                return const Center(
+                                    child: Text('No data available'));
                               }
-                              final docData = snapshot.data!.data() as Map<String, dynamic>;
+                              final docData =
+                                  snapshot.data!.data() as Map<String, dynamic>;
                               return Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-
                                   Padding(
                                     padding: const EdgeInsets.only(left: 12.0),
-                                    child: Text( "القاضي/ ${docData['name']}",style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),),
+                                    child: Text(
+                                      "القاضي/ ${docData['name']}",
+                                      style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold),
+                                    ),
                                   ),
                                   InkWell(
-                                    onTap: (){
+                                    onTap: () {
                                       Navigator.of(context).push(
-                                        MaterialPageRoute(builder: (context) =>  EditorHomeScreen(name: docData['name'],phoneNumber: docData['phone_number'],)),
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                EditorHomeScreen(
+                                                  name: docData['name'],
+                                                  phoneNumber:
+                                                      docData['phone_number'],
+                                                )),
                                       );
                                     },
                                     child: Container(
@@ -146,24 +163,32 @@ class _HomeScreenState extends State<HomeScreen> {
                                       width: 40,
                                       decoration: BoxDecoration(
                                         gradient: const LinearGradient(
-                                          colors: [Color(0xFFC67C4E), Colors.grey], // ألوان التدرج
-                                          begin: Alignment.bottomRight, // بداية التدرج
-                                          end: Alignment.topLeft, // نهاية التدرج
+                                          colors: [
+                                            Color(0xFFC67C4E),
+                                            Colors.grey
+                                          ], // ألوان التدرج
+                                          begin: Alignment
+                                              .bottomRight, // بداية التدرج
+                                          end:
+                                              Alignment.topLeft, // نهاية التدرج
                                         ),
                                         borderRadius: BorderRadius.circular(25),
                                         color: const Color(0xFFC67C4E),
                                       ),
                                       child: const Center(
-                                        child: Icon(Icons.edit, color: Colors.white,),
+                                        child: Icon(
+                                          Icons.edit,
+                                          color: Colors.white,
+                                        ),
                                       ),
                                     ),
                                   )
                                 ],
                               );
-                            }
+                            }),
+                        const SizedBox(
+                          height: 65,
                         ),
-
-                        const SizedBox(height: 65,),
                         Row(
                           children: [
                             /// search
@@ -175,8 +200,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                   width: double.infinity,
                                   decoration: BoxDecoration(
                                     gradient: const LinearGradient(
-                                      colors: [Color(0xFFC67C4E), Colors.grey], // ألوان التدرج
-                                      begin: Alignment.bottomRight, // بداية التدرج
+                                      colors: [
+                                        Color(0xFFC67C4E),
+                                        Colors.grey
+                                      ], // ألوان التدرج
+                                      begin:
+                                          Alignment.bottomRight, // بداية التدرج
                                       end: Alignment.topLeft, // نهاية التدرج
                                     ),
                                     borderRadius: BorderRadius.circular(25),
@@ -184,16 +213,20 @@ class _HomeScreenState extends State<HomeScreen> {
                                   child: const Row(
                                     children: [
                                       Padding(
-                                        padding: EdgeInsets.symmetric(horizontal: 10),
-                                        child: Icon(Icons.search, color: Colors.white, size: 30),
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 10),
+                                        child: Icon(Icons.search,
+                                            color: Colors.white, size: 30),
                                       ),
-                                      Text('...بحث', style: TextStyle(color: Colors.white, fontSize: 20)),
+                                      Text('...بحث',
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 20)),
                                     ],
                                   ),
                                 ),
                               ),
                             ),
-
 
                             /// filter
                             InkWell(
@@ -203,16 +236,23 @@ class _HomeScreenState extends State<HomeScreen> {
                                 width: 60,
                                 decoration: BoxDecoration(
                                   gradient: const LinearGradient(
-                                    colors: [Color(0xFFC67C4E), Colors.grey], // ألوان التدرج
-                                    begin: Alignment.bottomRight, // بداية التدرج
+                                    colors: [
+                                      Color(0xFFC67C4E),
+                                      Colors.grey
+                                    ], // ألوان التدرج
+                                    begin:
+                                        Alignment.bottomRight, // بداية التدرج
                                     end: Alignment.topLeft, // نهاية التدرج
                                   ),
                                   borderRadius: BorderRadius.circular(25),
                                   color: const Color(0xFFC67C4E),
-
                                 ),
                                 child: const Center(
-                                  child: Icon(Icons.filter_alt_outlined, color: Colors.white, size: 30,),
+                                  child: Icon(
+                                    Icons.filter_alt_outlined,
+                                    color: Colors.white,
+                                    size: 30,
+                                  ),
                                 ),
                               ),
                             )
@@ -224,6 +264,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ],
             ),
+
             /// appbar section
 
             Column(
@@ -238,32 +279,38 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: GestureDetector(
                           onTap: () {
                             setState(() {
-                              if(_selectedIndex == index){
-
-                              }else {
+                              if (_selectedIndex == index) {
+                              } else {
                                 _selectedIndex = index; // تحديث العنصر المحدد
                               }
                             });
-
                           },
                           child: Container(
                             height: 40,
                             width: 80,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(16),
-                              color: _selectedIndex == index ? Colors.grey : Colors.brown, // تغيير اللون بناءً على العنصر المحدد
+                              color: _selectedIndex == index
+                                  ? Colors.grey
+                                  : Colors
+                                      .brown, // تغيير اللون بناءً على العنصر المحدد
                             ),
-                            child:  Center(
+                            child: Center(
                                 child: Text(
-                                  0 == index?"اليوم":(1 == index)?"غدًا":(2 == index)?"بعد غدًا":"الكل",
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: _selectedIndex == index ? Colors.black : Colors.white
-                                  ),
-                                )
-                            ),
-
+                              0 == index
+                                  ? "اليوم"
+                                  : (1 == index)
+                                      ? "غدًا"
+                                      : (2 == index)
+                                          ? "بعد غدًا"
+                                          : "الكل",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: _selectedIndex == index
+                                      ? Colors.black
+                                      : Colors.white),
+                            )),
                           ),
                         ),
                       );
@@ -273,127 +320,259 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
 
-            const SizedBox(height: 5,),
-             const SizedBox(height: 5,),
-             (3 == _selectedIndex)
-                 ?Column(
-               children: [
-                 _buildStream(stream: FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getTodayDate(),procedure: _selectedProcedureValue==_options[0]?" ":_selectedProcedureValue!), dayH: GetDate.getDayH(),date: GetDate.getTodayDate()),
-                 _buildStream(stream: FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getNextDay(),procedure: _selectedProcedureValue==_options[0]?" ":_selectedProcedureValue!), dayH: GetDate.getNextDayH(),date: GetDate.getNextDay()),
-                 _buildStream(stream: FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getNextNextDay(),procedure: _selectedProcedureValue==_options[0]?" ":_selectedProcedureValue!), dayH: GetDate.getNextNextDayH(), date: GetDate.getNextNextDay()),
+            const SizedBox(
+              height: 5,
+            ),
+            const SizedBox(
+              height: 5,
+            ),
+            (3 == _selectedIndex)
+                ? Column(
+                    children: [
+                      _buildStream(
+                          stream: FirebaseRepository.getAllCasesByDate(
+                              phoneNumber: phoneNumber!,
+                              date: GetDate.getTodayDate(),
+                              procedure: _selectedProcedureValue == _options[0]
+                                  ? " "
+                                  : _selectedProcedureValue!),
+                          dayH: GetDate.getDayH(),
+                          date: GetDate.getTodayDate()),
+                      _buildStream(
+                          stream: FirebaseRepository.getAllCasesByDate(
+                              phoneNumber: phoneNumber!,
+                              date: GetDate.getNextDay(),
+                              procedure: _selectedProcedureValue == _options[0]
+                                  ? " "
+                                  : _selectedProcedureValue!),
+                          dayH: GetDate.getNextDayH(),
+                          date: GetDate.getNextDay()),
+                      _buildStream(
+                          stream: FirebaseRepository.getAllCasesByDate(
+                              phoneNumber: phoneNumber!,
+                              date: GetDate.getNextNextDay(),
+                              procedure: _selectedProcedureValue == _options[0]
+                                  ? " "
+                                  : _selectedProcedureValue!),
+                          dayH: GetDate.getNextNextDayH(),
+                          date: GetDate.getNextNextDay()),
+                      _buildStream(
+                          stream: FirebaseRepository.getAllCasesByDate(
+                              phoneNumber: phoneNumber!,
+                              date: GetDate.getNextNext1Day(),
+                              procedure: _selectedProcedureValue == _options[0]
+                                  ? " "
+                                  : _selectedProcedureValue!),
+                          dayH: GetDate.getNextNext1DayH(),
+                          date: GetDate.getNextNext1Day()),
+                      _buildStream(
+                          stream: FirebaseRepository.getAllCasesByDate(
+                              phoneNumber: phoneNumber!,
+                              date: GetDate.getNextNext2Day(),
+                              procedure: _selectedProcedureValue == _options[0]
+                                  ? " "
+                                  : _selectedProcedureValue!),
+                          dayH: GetDate.getNextNext2DayH(),
+                          date: GetDate.getNextNext2Day()),
+                      _buildStream(
+                          stream: FirebaseRepository.getAllCasesByDate(
+                              phoneNumber: phoneNumber!,
+                              date: GetDate.getNextNext3Day(),
+                              procedure: _selectedProcedureValue == _options[0]
+                                  ? " "
+                                  : _selectedProcedureValue!),
+                          dayH: GetDate.getNextNext3DayH(),
+                          date: GetDate.getNextNext3Day()),
+                      _buildStream(
+                          stream: FirebaseRepository.getAllCasesByDate(
+                              phoneNumber: phoneNumber!,
+                              date: GetDate.getNextNext4Day(),
+                              procedure: _selectedProcedureValue == _options[0]
+                                  ? " "
+                                  : _selectedProcedureValue!),
+                          dayH: GetDate.getNextNext4DayH(),
+                          date: GetDate.getNextNext4Day()),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      Text(
+                        'كل القضايا ما قبل ${GetDate.getTodayDate()}',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      _buildStream(
+                          stream: FirebaseRepository.getCasesBeforeDate(
+                              GetDate.getTodayDate(), phoneNumber!,
+                              procedure: _selectedProcedureValue == _options[0]
+                                  ? " "
+                                  : _selectedProcedureValue!),
+                          dayH: GetDate.getNextNext4DayH(),
+                          date: GetDate.getNextNext4Day(),
+                          beforeYesterday: true),
+                    ],
+                  )
+                : Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Align(
+                              alignment: Alignment.centerRight,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  "${(2 == _selectedIndex) ? GetDate.getNextNextDayH() : (1 == _selectedIndex) ? GetDate.getNextDayH() : GetDate.getDayH()} - ${GetDate.getMonthH()} - ${GetDate.getYearH()}هـ",
+                                  style: const TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.deepPurple),
+                                ),
+                              )),
+                          Align(
+                              alignment: Alignment.centerLeft,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  (0 == _selectedIndex)
+                                      ? GetDate.getTodayDate()
+                                      : (1 == _selectedIndex)
+                                          ? GetDate.getNextDay()
+                                          : GetDate.getNextNextDay(),
+                                  style: const TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.deepPurple),
+                                ),
+                              )),
+                        ],
+                      ),
+                      StreamBuilder<QuerySnapshot>(
+                        stream: (0 == _selectedIndex)
+                            ? FirebaseRepository.getAllCasesByDate(
+                                phoneNumber: phoneNumber!,
+                                date: GetDate.getTodayDate(),
+                                procedure:
+                                    _selectedProcedureValue == _options[0]
+                                        ? " "
+                                        : _selectedProcedureValue!)
+                            : (1 == _selectedIndex)
+                                ? FirebaseRepository.getAllCasesByDate(
+                                    phoneNumber: phoneNumber!,
+                                    date: GetDate.getNextDay(),
+                                    procedure:
+                                        _selectedProcedureValue == _options[0]
+                                            ? " "
+                                            : _selectedProcedureValue!)
+                                : (2 == _selectedIndex)
+                                    ? FirebaseRepository.getAllCasesByDate(
+                                        phoneNumber: phoneNumber!,
+                                        date: GetDate.getNextNextDay(),
+                                        procedure: _selectedProcedureValue ==
+                                                _options[0]
+                                            ? " "
+                                            : _selectedProcedureValue!)
+                                    : FirebaseRepository.getAllCases(
+                                        phoneNumber: phoneNumber ?? '0',
+                                        procedure: _selectedProcedureValue ==
+                                                _options[0]
+                                            ? " "
+                                            : _selectedProcedureValue!),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          }
 
-                 _buildStream(stream: FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getNextNext1Day(),procedure: _selectedProcedureValue==_options[0]?" ":_selectedProcedureValue!), dayH: GetDate.getNextNext1DayH(),date: GetDate.getNextNext1Day()),
-                 _buildStream(stream: FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getNextNext2Day(),procedure: _selectedProcedureValue==_options[0]?" ":_selectedProcedureValue!), dayH: GetDate.getNextNext2DayH(),date: GetDate.getNextNext2Day()),
-                 _buildStream(stream: FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getNextNext3Day(),procedure: _selectedProcedureValue==_options[0]?" ":_selectedProcedureValue!), dayH: GetDate.getNextNext3DayH(), date: GetDate.getNextNext3Day()),
-                 _buildStream(stream: FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getNextNext4Day(),procedure: _selectedProcedureValue==_options[0]?" ":_selectedProcedureValue!), dayH: GetDate.getNextNext4DayH(), date: GetDate.getNextNext4Day()),
+                          if (snapshot.hasError) {
+                            return Center(
+                                child: Text('Error: ${snapshot.error}'));
+                          }
 
-                 const SizedBox(height: 20,),
-                 Text('كل القضايا ما قبل ${GetDate.getTodayDate()}', style: const TextStyle(fontWeight: FontWeight.bold),),
-                 _buildStream(stream: FirebaseRepository.getCasesBeforeDate(GetDate.getTodayDate(), phoneNumber!,procedure: _selectedProcedureValue==_options[0]?" ":_selectedProcedureValue!), dayH: GetDate.getNextNext4DayH(), date: GetDate.getNextNext4Day(), beforeYesterday: true),
+                          if (!snapshot.hasData ||
+                              snapshot.data!.docs.isEmpty) {
+                            return const Center(
+                                child: Text('لا يوجد قضايا هذا اليوم'));
+                          }
 
-               ],
-             ):Column(
-               children: [
-                 Row(
-                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                   children: [
-                     Align(
-                         alignment: Alignment.centerRight,
-                         child: Padding(
-                           padding: const EdgeInsets.all(8.0),
-                           child: Text("${(2 == _selectedIndex) ?GetDate.getNextNextDayH():(1 == _selectedIndex) ?GetDate.getNextDayH()  : GetDate.getDayH()} - ${GetDate.getMonthH()} - ${GetDate.getYearH()}هـ", style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.deepPurple),),
-                         )
-                     ),
-                     Align(
-                         alignment: Alignment.centerLeft,
-                         child: Padding(
-                           padding: const EdgeInsets.all(8.0),
-                           child: Text((0 == _selectedIndex)?GetDate.getTodayDate():(1 == _selectedIndex)?GetDate.getNextDay():GetDate.getNextNextDay(), style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.deepPurple),),
-                         )
-                     ),
-                   ],
-                 ),
-                 StreamBuilder<QuerySnapshot>(
-                   stream: (0 == _selectedIndex)
-                       ?FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getTodayDate(),procedure: _selectedProcedureValue==_options[0]?" ":_selectedProcedureValue!)
-                       : (1 == _selectedIndex)
-                       ?FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getNextDay(),procedure: _selectedProcedureValue==_options[0]?" ":_selectedProcedureValue!)
-                       : (2 == _selectedIndex)
-                       ?FirebaseRepository.getAllCasesByDate(phoneNumber:phoneNumber!,date: GetDate.getNextNextDay(),procedure: _selectedProcedureValue==_options[0]?" ":_selectedProcedureValue!)
-                       :FirebaseRepository.getAllCases(phoneNumber:phoneNumber??'0',procedure: _selectedProcedureValue==_options[0]?" ":_selectedProcedureValue!),
-                   builder: (context, snapshot) {
-                     if (snapshot.connectionState == ConnectionState.waiting) {
-                       return const Center(child: CircularProgressIndicator());
-                     }
+                          final List<Widget> caseWidgets =
+                              snapshot.data!.docs.map((doc) {
+                            final caseData = doc.data() as Map<String, dynamic>;
 
-                     if (snapshot.hasError) {
-                       return Center(child: Text('Error: ${snapshot.error}'));
-                     }
+                            return CaseWidgetCommon(
+                                isAdmin: false,
+                                appellant: caseData['appellant'] ?? 'Unknown',
+                                caseNumber:
+                                    caseData['case_number'] ?? 'Unknown',
+                                dayName: caseData['day_name'] ?? 'Unknown',
+                                isCaseStatus: caseData['case_status'] ?? false,
+                                isDelivered: caseData['delivered'] ?? false,
+                                isPaid: caseData['is_paid'] ?? false,
+                                procedure: caseData['procedure'] ?? 'Unknown',
+                                respondent: caseData['respondent'] ?? 'Unknown',
+                                sessionDate: caseData['session_date'] ?? "",
+                                sessionDateHijri:
+                                    caseData['session_date_hijri'] ?? ' ',
+                                yearHijri: caseData['year_hijri'] ?? ' ');
+                          }).toList();
 
-                     if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                       return const Center(child: Text('لا يوجد قضايا هذا اليوم'));
-                     }
-
-                     final List<Widget> caseWidgets = snapshot.data!.docs.map((doc) {
-                       final caseData = doc.data() as Map<String, dynamic>;
-
-                       return CaseWidgetCommon(
-                           isAdmin:false,
-                           appellant: caseData['appellant'] ?? 'Unknown',
-                           caseNumber: caseData['case_number'] ?? 'Unknown',
-                           dayName: caseData['day_name'] ?? 'Unknown',
-                           isCaseStatus: caseData['case_status'] ?? false,
-                           isDelivered: caseData['delivered'] ?? false,
-                           isPaid: caseData['is_paid'] ?? false,
-                           procedure: caseData['procedure'] ?? 'Unknown',
-                           respondent: caseData['respondent'] ?? 'Unknown',
-                           sessionDate: caseData['session_date'] ?? "",
-                           sessionDateHijri: caseData['session_date_hijri']?? ' ',
-                           yearHijri: caseData['year_hijri']?? ' ');
-                     }).toList();
-
-                     return Padding(
-                       padding: const EdgeInsets.all(8.0),
-                       child: Wrap(
-                         spacing: 15.0, // Horizontal space between containers
-                         runSpacing: 15.0, // Vertical space between containers
-                         children: caseWidgets,
-                       ),
-                     );
-                   },
-                 ),
-               ],
-             ),
-
+                          return Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Wrap(
+                              spacing:
+                                  15.0, // Horizontal space between containers
+                              runSpacing:
+                                  15.0, // Vertical space between containers
+                              children: caseWidgets,
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
           ],
         ),
       ),
     );
   }
 
-  _buildStream({required dynamic stream, required dynamic dayH,required dynamic date,bool beforeYesterday = false}){
+  _buildStream(
+      {required dynamic stream,
+      required dynamic dayH,
+      required dynamic date,
+      bool beforeYesterday = false}) {
     return Column(
       children: [
-        !beforeYesterday?Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Align(
-                alignment: Alignment.centerRight,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text("$dayH - ${GetDate.getMonthH()} - ${GetDate.getYearH()}هـ", style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.deepPurple),),
-                )
-            ),
-            Align(
-                alignment: Alignment.centerLeft,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(date, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.deepPurple),),
-                )
-            ),
-          ],
-        ):const SizedBox.shrink(),
-
+        !beforeYesterday
+            ? Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Align(
+                      alignment: Alignment.centerRight,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          "$dayH - ${GetDate.getMonthH()} - ${GetDate.getYearH()}هـ",
+                          style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.deepPurple),
+                        ),
+                      )),
+                  Align(
+                      alignment: Alignment.centerLeft,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          date,
+                          style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.deepPurple),
+                        ),
+                      )),
+                ],
+              )
+            : const SizedBox.shrink(),
         StreamBuilder<QuerySnapshot>(
           stream: stream,
           builder: (context, snapshot) {
@@ -409,8 +588,7 @@ class _HomeScreenState extends State<HomeScreen> {
               return const Center(child: Text('لا يوجد قضايا هذا اليوم'));
             }
 
-            final List<Widget> caseWidgets = snapshot.data!.docs
-                .where((doc) {
+            final List<Widget> caseWidgets = snapshot.data!.docs.where((doc) {
               final caseData = doc.data() as Map<String, dynamic>;
 
               // If _selectedProcedureValue is "الكل", show all cases
@@ -419,9 +597,9 @@ class _HomeScreenState extends State<HomeScreen> {
               }
 
               // Filter cases based on selected procedure
-              return caseData['procedure'] == _selectedProcedureValue && !caseData['isDeleted'];
-            })
-                .map((doc) {
+              return caseData['procedure'] == _selectedProcedureValue &&
+                  !caseData['isDeleted'];
+            }).map((doc) {
               final caseData = doc.data() as Map<String, dynamic>;
 
               return CaseWidgetCommon(
