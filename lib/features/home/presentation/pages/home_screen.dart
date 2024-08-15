@@ -340,6 +340,8 @@ class _HomeScreenState extends State<HomeScreen> {
                        final caseData = doc.data() as Map<String, dynamic>;
 
                        return CaseWidgetCommon(
+                           judgeNumber: caseData['judge_number'],
+                         caseId: caseData['case_id'],
                            isAdmin:true,
                            appellant: caseData['appellant'] ?? 'Unknown',
                            caseNumber: caseData['case_number'] ?? 'Unknown',
@@ -485,6 +487,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       ...docs.map((doc) {
                         final caseData = doc.data() as Map<String, dynamic>;
                         return CaseWidgetCommon(
+                          judgeNumber: caseData['judge_number'],
+                          caseId: caseData['case_id'],
                           isAdmin: true,
                           appellant: caseData['appellant'] ?? 'Unknown',
                           caseNumber: caseData['case_number'] ?? 'Unknown',

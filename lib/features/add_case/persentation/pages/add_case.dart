@@ -85,6 +85,7 @@ class _AddCaseState extends State<AddCase> {
                   ),
 
                   const Center(child: Text('سيتم ادخال التاريخ الهجري اوتماتيكي ماعليك سوى إدخال التاريخ الميلادي', style: TextStyle(fontSize: 11),)),
+                  const SizedBox(height: 5,),
                   _buildTextFieldDate(
                     context: context,
                     label: 'اختر التاريخ الميلادي للجلسة',
@@ -97,7 +98,6 @@ class _AddCaseState extends State<AddCase> {
                     controller: _judgmentDateController,
                     label: 'تاريخ اصدار الحكم',
                     hintText: 'أدخل تاريخ الحكم مثل 10-08-2024',
-                    validator: _validateDate,
                   ),
                   _buildNumberField(controller: _yearController, label: "السنة", hintText: "ادخل السنة"),
                   _buildDropdown(

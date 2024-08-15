@@ -7,6 +7,8 @@ import '../../../features/edit_case/persentation/pages/edit_case.dart';
 class CaseWidgetCommon extends StatefulWidget {
   CaseWidgetCommon({
     super.key,
+    required this.judgeNumber,
+    required this.caseId,
     required this.caseNumber,
     required this.yearHijri,
     required this.procedure,
@@ -24,6 +26,8 @@ class CaseWidgetCommon extends StatefulWidget {
   this.isPaidFunction,
   this.deleteItem});
 
+  String caseId;
+  String judgeNumber;
   String caseNumber;
   String yearHijri;
   String procedure;
@@ -57,7 +61,7 @@ class _CaseWidgetCommonState extends State<CaseWidgetCommon> {
               ),
               child: InkWell(
                 onTap: (){
-                  Navigator.push(context, MaterialPageRoute(builder: (context)=>EditCase()));
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=>EditCase(caseId: widget.caseId,judgeNumber: widget.judgeNumber,)));
                 },
                 child: Card(
                     shape: RoundedRectangleBorder(
